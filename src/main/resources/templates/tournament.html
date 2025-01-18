@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tournament</title>
+<!--    <link rel="stylesheet" th:href="@{/css/common.css}">-->
+</head>
+<body>
+<div class="tournament-container">
+    <h1>Tournament</h1>
+    <p>Current Balance: <span th:text="${balance}"></span></p>
+
+    <h2>Buy Stocks</h2>
+    <form th:action="@{/api/stocks/buy}" method="post">
+        <input type="hidden" name="tournamentId" th:value="${tournamentId}">
+        <input type="text" name="ticker" placeholder="Ticker">
+        <input type="number" name="quantity" placeholder="Quantity">
+        <button type="submit">Buy</button>
+    </form>
+
+    <h2>Sell Stocks</h2>
+    <form th:action="@{/api/stocks/sell}" method="post">
+        <input type="hidden" name="tournamentId" th:value="${tournamentId}">
+        <input type="text" name="ticker" placeholder="Ticker">
+        <input type="number" name="quantity" placeholder="Quantity">
+        <button type="submit">Sell</button>
+    </form>
+</div>
+</body>
+</html>

@@ -14,6 +14,8 @@ import ru.screbber.stockSimulator.repository.UserRepository;
 import ru.screbber.stockSimulator.service.ParticipationService;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,4 +54,46 @@ public class ParticipationServiceImpl implements ParticipationService {
         );
     }
 
+    @Override
+    public List<TournamentDto> getUserTournaments(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Находим все участия пользователя
+        List<ParticipationEntity> participations = participationRepository.findByUser(user);
+
+        // Преобразуем участие в DTO турниров
+        return participations.stream()
+                .map(participation -> {
+                    TournamentEntity tournament = participation.getTournament();
+                    return new TournamentDto(tournament.getId(), tournament.getName());
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public BigDecimal getUserBalanceInTournament(String username, Long tournamentId) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        TournamentEntity tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new RuntimeException("Tournament not found"));
+
+        ParticipationEntity participation = participationRepository.findByUserAndTournament(user, tournament)
+                .orElseThrow(() -> new RuntimeException("Participation not found"));
+
+        return participation.getBalance();
+    }
+
+    @Override
+    public Long getParticipationByUsernameAndTournamentId(String username, Long tournamentId) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ParticipationEntity participation = participationRepository.findByUserAndTournament(user, tournamentRepository.findById(tournamentId)
+                        .orElseThrow(() -> new RuntimeException("Tournament not found")))
+                .orElseThrow(() -> new RuntimeException("Participation not found"));
+
+        return participation.getId();
+    }
 }

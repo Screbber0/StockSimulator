@@ -1,20 +1,24 @@
 package ru.screbber.stockSimulator.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import ru.screbber.stockSimulator.service.ParticipationService;
 import ru.screbber.stockSimulator.service.StockService;
 import ru.screbber.stockSimulator.service.StockTradingService;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
-@RestController
+@Controller
 @RequestMapping("/api/stocks")
 @RequiredArgsConstructor
 public class StockController {
 
     private final StockService stockService;
     private final StockTradingService stockTradingService;
+    private final ParticipationService participationService;
 
     @GetMapping("{ticker}")
     public BigDecimal GetStockPriceByTicker(@PathVariable String ticker) throws Exception {
@@ -23,20 +27,27 @@ public class StockController {
 
     // TODO: сделать рефактиринг исключений и перенести в один сервис
     @PostMapping("/buy")
-    public String buyStock(@RequestParam Long participationId, @RequestParam String ticker, @RequestParam int quantity) {
+    public String buyStock(@RequestParam Long tournamentId, @RequestParam String ticker, @RequestParam int quantity) {
         try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            Long participationId = participationService.getParticipationByUsernameAndTournamentId(username, tournamentId);
+
             stockTradingService.buyStock(participationId, ticker, quantity);
-            return "Stock purchased successfully!";
+            return "redirect:/tournament?tournamentId=" + tournamentId;
         } catch (Exception e) {
-            return e.getMessage();
+            return "error";
         }
     }
 
+
     @PostMapping("/sell")
-    public String sellStock(@RequestParam Long participationId, @RequestParam String ticker, @RequestParam int quantity) {
+    public String sellStock(@RequestParam Long tournamentId, @RequestParam String ticker, @RequestParam int quantity) {
         try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            Long participationId = participationService.getParticipationByUsernameAndTournamentId(username, tournamentId);
+
             stockTradingService.sellStock(participationId, ticker, quantity);
-            return "Stock sold successfully!";
+            return "redirect:/tournament?tournamentId=" + tournamentId;
         } catch (Exception e) {
             return e.getMessage();
         }

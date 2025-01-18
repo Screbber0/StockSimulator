@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+<!--    <link rel="stylesheet" th:href="@{/css/common.css}">-->
+</head>
+<body>
+<div class="dashboard-container">
+    <h1>Welcome, <span th:text="${#authentication.name}"></span>!</h1>
+
+    <h2>Actions</h2>
+    <form th:action="@{/tournament/create}" method="post">
+        <button type="submit">Create Tournament</button>
+    </form>
+
+    <form th:action="@{/tournament/join}" method="post">
+        <input type="text" name="tournamentId" placeholder="Enter Tournament ID">
+        <button type="submit">Join Tournament</button>
+    </form>
+
+    <h2>Your Tournaments</h2>
+    <ul>
+        <li th:each="tournament : ${tournaments}">
+            <span th:text="${tournament.name}"></span>
+            <a th:href="@{/tournament(tournamentId=${tournament.id})}">View Tournament</a>
+        </li>
+    </ul>
+
+</div>
+</body>
+</html>

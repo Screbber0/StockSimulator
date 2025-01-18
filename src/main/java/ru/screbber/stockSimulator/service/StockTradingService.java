@@ -8,7 +8,6 @@ public interface StockTradingService {
 
     void sellStock(Long participationId, String ticker, int quantity) throws Exception;
 
-
     Map<String, Integer> getUserStocks(Long participationId) throws Exception;
 
 }
