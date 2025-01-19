@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.screbber.stockSimulator.exception.StockNotFoundException;
-import ru.screbber.stockSimulator.service.StockService;
+import ru.screbber.stockSimulator.service.StockSourceService;
 import ru.tinkoff.piapi.contract.v1.LastPrice;
 import ru.tinkoff.piapi.contract.v1.Share;
 import ru.tinkoff.piapi.core.InvestApi;
@@ -19,11 +19,11 @@ import static ru.tinkoff.piapi.core.utils.MapperUtils.quotationToBigDecimal;
 
 @Service
 @RequiredArgsConstructor
-public class TinkoffStockService implements StockService {
+public class TinkoffStockSourceService implements StockSourceService {
 
     private final InvestApi api;
 
-    static final Logger log = LoggerFactory.getLogger(TinkoffStockService.class);
+    static final Logger log = LoggerFactory.getLogger(TinkoffStockSourceService.class);
 
     public BigDecimal getStockPriceByTicker(String ticker) {
         // TODO: изменить весь метод

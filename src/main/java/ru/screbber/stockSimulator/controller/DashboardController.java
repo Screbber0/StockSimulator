@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.screbber.stockSimulator.dto.TournamentDto;
-import ru.screbber.stockSimulator.service.ParticipationService;
+import ru.screbber.stockSimulator.service.TournamentService;
 
 import java.util.List;
 
@@ -14,21 +14,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DashboardController {
 
-    private final ParticipationService participationService;
+    private final TournamentService tournamentService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-
-        // Получаем имя текущего пользователя
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<TournamentDto> tournaments = tournamentService.getTournaments(username);
 
-        // Загружаем турниры, в которых участвует пользователь
-        List<TournamentDto> tournaments = participationService.getUserTournaments(username);
-
-        // Передаем список турниров в модель
         model.addAttribute("tournaments", tournaments);
-
-        return "dashboard"; // Возвращаем шаблон "dashboard.html"
+        return "dashboard";
     }
 }
 

@@ -4,56 +4,50 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import ru.screbber.stockSimulator.entity.TournamentEntity;
-import ru.screbber.stockSimulator.service.ParticipationService;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.screbber.stockSimulator.service.TournamentService;
 
 import java.math.BigDecimal;
 
 @Controller
-// @RequestMapping("/api/tournaments")
+@RequestMapping("tournament")
 @RequiredArgsConstructor
 public class TournamentController {
 
     private final TournamentService tournamentService;
 
-    private final ParticipationService participationService;
-
     @PostMapping("/create")
-    public TournamentEntity createTournament(@RequestParam String name) {
+    public String createTournament(@RequestParam String name, RedirectAttributes redirectAttributes) {
         try {
-            return tournamentService.createTournament(name);
+            tournamentService.createTournament(name);
+            // redirectAttributes.addFlashAttribute("successMessage", "Турнир успешно создан!");
+            return "redirect:/dashboard";
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            // redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/dashboard";
         }
     }
 
-    @GetMapping("/tournament")
-    public String tournament(@RequestParam Long tournamentId, Model model) {
-        // Получаем имя текущего пользователя
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        // Получаем баланс пользователя в турнире
-        BigDecimal balance = participationService.getUserBalanceInTournament(username, tournamentId);
-
-        // Добавляем данные в модель
-        model.addAttribute("tournamentId", tournamentId);
-        model.addAttribute("balance", balance);
-
-        return "tournament";
-    }
-
-    @PostMapping("/tournament/join")
+    @PostMapping("/join")
     public String joinTournament(@RequestParam Long tournamentId) {
         try {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            participationService.joinTournament(username, tournamentId);
+            tournamentService.joinTournament(username, tournamentId);
             return "redirect:/dashboard";
         } catch (Exception e) {
             return "error";
         }
+    }
+
+    @GetMapping("/{tournamentId}")
+    public String tournament(@PathVariable Long tournamentId, Model model) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        BigDecimal balance = tournamentService.getUserBalanceInTournament(username, tournamentId);
+
+        model.addAttribute("tournamentId", tournamentId);
+        model.addAttribute("balance", balance);
+
+        return "tournament";
     }
 }

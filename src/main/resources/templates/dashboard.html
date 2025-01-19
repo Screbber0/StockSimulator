@@ -10,6 +10,7 @@
 
     <h2>Actions</h2>
     <form th:action="@{/tournament/create}" method="post">
+        <input type="text" name="name" placeholder="Tournament Name" required />
         <button type="submit">Create Tournament</button>
     </form>
 
@@ -22,7 +23,7 @@
     <ul>
         <li th:each="tournament : ${tournaments}">
             <span th:text="${tournament.name}"></span>
-            <a th:href="@{/tournament(tournamentId=${tournament.id})}">View Tournament</a>
+            <a th:href="@{/tournament/{tournamentId}(tournamentId=${tournament.id})}">View Tournament</a>
         </li>
     </ul>
 

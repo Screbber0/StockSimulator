@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.screbber.stockSimulator.entity.ParticipationEntity;
 import ru.screbber.stockSimulator.repository.ParticipationRepository;
-import ru.screbber.stockSimulator.service.StockService;
+import ru.screbber.stockSimulator.service.StockSourceService;
 import ru.screbber.stockSimulator.service.StockTradingService;
 
 import java.math.BigDecimal;
@@ -16,13 +16,13 @@ public class StockTradingServiceImpl implements StockTradingService {
 
     private final ParticipationRepository participationRepository;
 
-    private final StockService stockService;
+    private final StockSourceService stockSourceService;
 
     public void buyStock(Long participationId, String ticker, int quantity) throws Exception {
         ParticipationEntity participation = participationRepository.findById(participationId)
                 .orElseThrow(() -> new Exception("Participation not found"));
 
-        BigDecimal stockPrice = stockService.getStockPriceByTicker(ticker);
+        BigDecimal stockPrice = stockSourceService.getStockPriceByTicker(ticker);
         BigDecimal totalPrice = stockPrice.multiply(BigDecimal.valueOf(quantity));
 
         if (participation.getBalance().compareTo(totalPrice) < 0) {
@@ -45,7 +45,7 @@ public class StockTradingServiceImpl implements StockTradingService {
             throw new Exception("Not enough stocks to sell");
         }
 
-        BigDecimal stockPrice = stockService.getStockPriceByTicker(ticker);
+        BigDecimal stockPrice = stockSourceService.getStockPriceByTicker(ticker);
         BigDecimal totalPrice = stockPrice.multiply(BigDecimal.valueOf(quantity));
 
         participation.setBalance(participation.getBalance().add(totalPrice));
