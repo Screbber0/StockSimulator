@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Tournament</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .form-container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input, select {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h1>Create Tournament</h1>
+    <form th:action="@{/tournament/create}" method="post" th:object="${createTournamentDto}">
+        <label for="name">Tournament Name</label>
+        <input type="text" id="name" name="name" placeholder="Enter tournament name" required>
+
+        <!-- Поле выбора диапазона дат (start -> end) -->
+        <label for="dateRange">Date Range</label>
+        <input type="text" id="dateRange" name="dateRange" required>
+
+        <!-- Остальные поля формы -->
+        <label for="initialCapital">Initial Virtual Capital</label>
+        <select id="initialCapital" name="initialCapital" required>
+            <option value="50000">50 000 ₽</option>
+            <option value="100000">100 000 ₽</option>
+            <option value="250000">250 000 ₽</option>
+            <option value="500000">500 000 ₽</option>
+            <option value="1000000">1 000 000 ₽</option>
+            <option value="5000000">5 000 000 ₽</option>
+        </select>
+
+        <label for="maxParticipants">Max Participants</label>
+        <input type="number" id="maxParticipants" name="maxParticipants" placeholder="Enter max participants" required>
+
+        <button type="submit">Create Tournament</button>
+    </form>
+</div>
+
+<!-- Скрипты для jQuery, moment и DateRangePicker -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.2/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1/daterangepicker.min.js"></script>
+
+<script>
+    $(function() {
+        // Сегодняшняя дата
+        let today = moment().startOf('day');
+
+        // Инициализируем плагин
+        $('#dateRange').daterangepicker({
+            singleDatePicker: false,      // Если хотите выбрать именно диапазон (начало–конец), оставляем false
+            startDate: today,            // Дата начала по умолчанию = сегодня
+            endDate: today.clone().add(7, 'days'), // Можно заранее задать конец (+7 дней для примера)
+            minDate: today,              // Нельзя выбрать дату раньше сегодня
+            locale: {
+                format: 'YYYY-MM-DD',    // Формат отображения дат
+                separator: ' ➡ ',        // Разделитель между датами
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

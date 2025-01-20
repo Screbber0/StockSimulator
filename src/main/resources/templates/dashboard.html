@@ -9,10 +9,9 @@
     <h1>Welcome, <span th:text="${#authentication.name}"></span>!</h1>
 
     <h2>Actions</h2>
-    <form th:action="@{/tournament/create}" method="post">
-        <input type="text" name="name" placeholder="Tournament Name" required />
-        <button type="submit">Create Tournament</button>
-    </form>
+    <a th:href="@{/tournament/create}">
+        <button type="button">Create Tournament</button>
+    </a>
 
     <form th:action="@{/tournament/join}" method="post">
         <input type="text" name="tournamentId" placeholder="Enter Tournament ID">

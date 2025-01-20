@@ -14,8 +14,15 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void createUser(UserEntity user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+    @Override
+    public void registerUser(String username, String password) throws Exception {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new Exception("Username is already taken.");
+        }
+
+        UserEntity newUser = new UserEntity();
+        newUser.setUsername(username);
+        newUser.setPassword(passwordEncoder.encode(password));
+        userRepository.save(newUser);
     }
 }

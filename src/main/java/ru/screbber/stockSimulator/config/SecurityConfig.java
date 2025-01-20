@@ -23,7 +23,7 @@ public class SecurityConfig {
         // TODO: настроить цепочку фильтров
         return http.csrf(AbstractHttpConfigurer::disable)
                 //.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/css/**", "/js/**").permitAll()
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/**").authenticated()
                 )
                 .formLogin(login -> login

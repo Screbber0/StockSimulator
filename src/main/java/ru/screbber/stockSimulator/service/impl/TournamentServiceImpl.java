@@ -2,6 +2,7 @@ package ru.screbber.stockSimulator.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.screbber.stockSimulator.dto.CreateTournamentDto;
 import ru.screbber.stockSimulator.dto.ParticipationDto;
 import ru.screbber.stockSimulator.dto.TournamentDto;
 import ru.screbber.stockSimulator.dto.UserDto;
@@ -27,9 +28,15 @@ public class TournamentServiceImpl implements TournamentService {
 
     private final TournamentRepository tournamentRepository;
 
-    public void createTournament(String name) {
+    @Override
+    public void createTournament(CreateTournamentDto dto) {
         TournamentEntity tournament = new TournamentEntity();
-        tournament.setName(name);
+        tournament.setName(dto.getName());
+        tournament.setStartDate(dto.getStartDate());
+        tournament.setEndDate(dto.getEndDate());
+        tournament.setInitialCapital(dto.getInitialCapital());
+        tournament.setMaxParticipants(dto.getMaxParticipants());
+
         tournamentRepository.save(tournament);
     }
 
@@ -44,7 +51,7 @@ public class TournamentServiceImpl implements TournamentService {
         ParticipationEntity participation = new ParticipationEntity();
         participation.setUser(user);
         participation.setTournament(tournament);
-        participation.setBalance(BigDecimal.valueOf(10000));
+        participation.setBalance(tournament.getInitialCapital());
         ParticipationEntity savedParticipation = participationRepository.save(participation);
 
         // Преобразуем сущности в DTO

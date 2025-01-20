@@ -5,7 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.screbber.stockSimulator.dto.CreateTournamentDto;
 import ru.screbber.stockSimulator.service.StockTradingService;
 import ru.screbber.stockSimulator.service.TournamentService;
 
@@ -20,14 +20,18 @@ public class TournamentController {
     private final TournamentService tournamentService;
     private final StockTradingService stockTradingService;
 
+    @GetMapping("/create")
+    public String showCreateTournamentPage(Model model) {
+        model.addAttribute("createTournamentDto", new CreateTournamentDto());
+        return "createTournament";
+    }
+
     @PostMapping("/create")
-    public String createTournament(@RequestParam String name, RedirectAttributes redirectAttributes) {
+    public String createTournament(@ModelAttribute CreateTournamentDto createTournamentDto) {
         try {
-            tournamentService.createTournament(name);
-            // redirectAttributes.addFlashAttribute("successMessage", "Турнир успешно создан!");
+            tournamentService.createTournament(createTournamentDto);
             return "redirect:/dashboard";
         } catch (Exception e) {
-            // redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/dashboard";
         }
     }
