@@ -33,7 +33,7 @@ public class StockController {
             Long participationId = tournamentService.getParticipationByUsernameAndTournamentId(username, tournamentId);
 
             stockTradingService.buyStock(participationId, ticker, quantity);
-            return "redirect:/tournament?tournamentId=" + tournamentId;
+            return "redirect:/tournament/" + tournamentId;
         } catch (Exception e) {
             return "error";
         }
@@ -47,7 +47,7 @@ public class StockController {
             Long participationId = tournamentService.getParticipationByUsernameAndTournamentId(username, tournamentId);
 
             stockTradingService.sellStock(participationId, ticker, quantity);
-            return "redirect:/tournament?tournamentId=" + tournamentId;
+            return "redirect:/tournament/" + tournamentId;
         } catch (Exception e) {
             return e.getMessage();
         }

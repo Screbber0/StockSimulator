@@ -24,6 +24,29 @@
         <input type="number" name="quantity" placeholder="Quantity">
         <button type="submit">Sell</button>
     </form>
+
+    <!-- Секция для отображения акций пользователя -->
+    <h2>Your Stocks</h2>
+    <div th:if="${#lists.isEmpty(stocks)}">
+        <p>You have no stocks in this tournament.</p>
+    </div>
+    <div th:unless="${#lists.isEmpty(stocks)}">
+        <table>
+            <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Quantity</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="entry : ${stocks}">
+                <td th:text="${entry.key}"></td>
+                <td th:text="${entry.value}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    
 </div>
 </body>
 </html>
