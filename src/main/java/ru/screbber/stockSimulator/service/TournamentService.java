@@ -15,7 +15,7 @@ public interface TournamentService {
 
     List<TournamentDto> getTournaments(String username);
 
-    BigDecimal getUserBalanceInTournament(String username, Long tournamentId);
+    BigDecimal getUserCashInTournament(String username, Long tournamentId);
 
     Long getParticipationByUsernameAndTournamentId(String username, Long tournamentId);
 }

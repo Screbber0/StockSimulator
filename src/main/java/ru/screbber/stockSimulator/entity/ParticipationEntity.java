@@ -26,7 +26,7 @@ public class ParticipationEntity {
     @JoinColumn(name = "tournament_id", nullable = false)
     private TournamentEntity tournament;
 
-    private BigDecimal balance;
+    private BigDecimal cash;
 
     @OneToMany(mappedBy = "participation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StockPositionEntity> stockPositions = new ArrayList<>();

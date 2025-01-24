@@ -53,7 +53,7 @@ public class TournamentServiceImpl implements TournamentService {
         ParticipationEntity participation = new ParticipationEntity();
         participation.setUser(user);
         participation.setTournament(tournament);
-        participation.setBalance(tournament.getInitialCapital());
+        participation.setCash(tournament.getInitialCapital());
         ParticipationEntity savedParticipation = participationRepository.save(participation);
 
         // Преобразуем сущности в DTO
@@ -64,7 +64,7 @@ public class TournamentServiceImpl implements TournamentService {
                 savedParticipation.getId(),
                 userDto,
                 tournamentDto,
-                savedParticipation.getBalance()
+                savedParticipation.getCash()
         );
     }
 
@@ -86,7 +86,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public BigDecimal getUserBalanceInTournament(String username, Long tournamentId) {
+    public BigDecimal getUserCashInTournament(String username, Long tournamentId) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -96,7 +96,7 @@ public class TournamentServiceImpl implements TournamentService {
         ParticipationEntity participation = participationRepository.findByUserAndTournament(user, tournament)
                 .orElseThrow(() -> new RuntimeException("Participation not found"));
 
-        return participation.getBalance();
+        return participation.getCash();
     }
 
     @Override

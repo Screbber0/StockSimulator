@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.screbber.stockSimulator.dto.StockPositionDto;
 import ru.screbber.stockSimulator.entity.ParticipationEntity;
 import ru.screbber.stockSimulator.entity.StockPositionEntity;
-import ru.screbber.stockSimulator.exception.InsufficientBalanceException;
+import ru.screbber.stockSimulator.exception.InsufficientCashException;
 import ru.screbber.stockSimulator.exception.NoSuchTickerInYourPortfolioException;
 import ru.screbber.stockSimulator.exception.NotEnoughStocksToSellException;
 import ru.screbber.stockSimulator.exception.ParticipationNotFound;
@@ -36,12 +36,12 @@ public class StockTradingServiceImpl implements StockTradingService {
         BigDecimal totalPrice = stockPrice.multiply(BigDecimal.valueOf(quantity));
 
         // 1. Проверяем баланс
-        if (participation.getBalance().compareTo(totalPrice) < 0) {
-            throw new InsufficientBalanceException("Insufficient balance in tournament");
+        if (participation.getCash().compareTo(totalPrice) < 0) {
+            throw new InsufficientCashException("Insufficient cash in tournament");
         }
 
         // 2. Списываем деньги
-        participation.setBalance(participation.getBalance().subtract(totalPrice));
+        participation.setCash(participation.getCash().subtract(totalPrice));
 
         // 3. Пытаемся найти существующую позицию
         StockPositionEntity position = participation.getStockPositions().stream()
@@ -94,7 +94,7 @@ public class StockTradingServiceImpl implements StockTradingService {
             throw new NotEnoughStocksToSellException("Not enough stocks to sell");
         }
 
-        participation.setBalance(participation.getBalance().add(totalPrice));
+        participation.setCash(participation.getCash().add(totalPrice));
 
         int newQuantity = position.getQuantity() - quantity;
         position.setQuantity(newQuantity);

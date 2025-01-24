@@ -52,12 +52,12 @@ public class TournamentController {
     public String tournament(@PathVariable Long tournamentId, Model model) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        BigDecimal balance = tournamentService.getUserBalanceInTournament(username, tournamentId);
+        BigDecimal cash = tournamentService.getUserCashInTournament(username, tournamentId);
         Long participationId = tournamentService.getParticipationByUsernameAndTournamentId(username, tournamentId);
         List<StockPositionDto> userStockPositions = stockTradingService.getUserStockPositions(participationId);
 
         model.addAttribute("tournamentId", tournamentId);
-        model.addAttribute("balance", balance);
+        model.addAttribute("cash", cash);
         model.addAttribute("stocks", userStockPositions);
 
         return "tournament";

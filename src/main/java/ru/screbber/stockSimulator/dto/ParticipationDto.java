@@ -15,5 +15,5 @@ public class ParticipationDto {
 
     private TournamentDto tournament;
 
-    private BigDecimal balance;
+    private BigDecimal cash;
 }
