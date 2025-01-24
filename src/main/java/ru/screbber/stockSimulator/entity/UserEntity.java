@@ -3,11 +3,13 @@ package ru.screbber.stockSimulator.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@ToString(exclude = {"tournaments"})
 @Entity
 @Table(name = "users")
 public class UserEntity {

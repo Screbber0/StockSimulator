@@ -95,6 +95,25 @@
         <label for="maxParticipants">Max Participants</label>
         <input type="number" id="maxParticipants" name="maxParticipants" placeholder="Enter max participants" required>
 
+        <!-- Новое поле: выбор режима (enum) -->
+        <label for="tournamentMode">Tournament Mode</label>
+        <select id="tournamentMode" th:field="*{tournamentMode}" required
+                onchange="toggleRandomStocks(this.value)">
+            <!-- Генерируем <option> из enum -->
+            <option th:each="mode : ${T(ru.screbber.stockSimulator.constants.TournamentMode).values()}"
+                    th:value="${mode}"
+                    th:text="${mode}"></option>
+        </select>
+
+        <!-- Блок для выбора числа случайных акций -->
+        <div id="randomStocksBlock">
+            <label for="randomStocksCount">Random Stocks Count</label>
+            <input type="number" id="randomStocksCount" th:field="*{randomStocksCount}" min="0" value="0" />
+        </div>
+
+        <!-- Ошибки, если есть -->
+        <div th:if="${error}" th:text="${error}" style="color:red;"></div>
+
         <button type="submit">Create Tournament</button>
     </form>
 </div>
@@ -105,6 +124,17 @@
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1/daterangepicker.min.js"></script>
 
 <script>
+    // Функция для переключения отображения поля randomStocksCount
+    function toggleRandomStocks(modeValue) {
+        const block = document.getElementById('randomStocksBlock');
+        // Если выбрано LIMITED_RANDOM — показываем, иначе скрываем
+        if (modeValue === 'LIMITED_RANDOM') {
+            block.style.display = 'block';
+        } else {
+            block.style.display = 'none';
+        }
+    }
+
     $(function() {
         // Сегодняшняя дата
         let today = moment().startOf('day');
@@ -120,8 +150,11 @@
                 separator: ' ➡ ',        // Разделитель между датами
             }
         });
+
+        // При загрузке страницы сразу скрываем/показываем блок в зависимости от текущего режима
+        const modeSelect = document.getElementById('tournamentMode');
+        toggleRandomStocks(modeSelect.value);
     });
 </script>
-
 </body>
 </html>

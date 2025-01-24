@@ -36,6 +36,8 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setEndDate(dto.getEndDate());
         tournament.setInitialCapital(dto.getInitialCapital());
         tournament.setMaxParticipants(dto.getMaxParticipants());
+        tournament.setMode(dto.getTournamentMode());
+        tournament.setRandomStocksCount(dto.getRandomStocksCount());
 
         tournamentRepository.save(tournament);
     }
@@ -62,8 +64,7 @@ public class TournamentServiceImpl implements TournamentService {
                 savedParticipation.getId(),
                 userDto,
                 tournamentDto,
-                savedParticipation.getBalance(),
-                savedParticipation.getStocks()
+                savedParticipation.getBalance()
         );
     }
 

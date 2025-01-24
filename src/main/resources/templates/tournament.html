@@ -2,12 +2,45 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Tournament</title>
-<!--    <link rel="stylesheet" th:href="@{/css/common.css}">-->
+    <link rel="stylesheet"
+          href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
+    <style>
+        .text-green {
+            color: green;
+        }
+        .text-red {
+            color: red;
+        }
+
+        .arrow-up, .arrow-down {
+            font-size: 12px; /* Размер стрелки */
+            margin-left: -3px;
+            padding: 0; /* Убираем внутренние отступы */
+            vertical-align: baseline; /* Выравнивание по линии текста */
+        }
+
+        .arrow-up {
+            color: green; /* Цвет стрелки вверх */
+        }
+
+        .arrow-down {
+            color: red; /* Цвет стрелки вниз */
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+        table th,
+        table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+    </style>
 </head>
 <body>
 <div class="tournament-container">
     <h1>Tournament</h1>
-    <p>Current Balance: <span th:text="${balance}"></span></p>
+    <p>Current Balance: <span th:text="${balance}">0</span></p>
 
     <h2>Buy Stocks</h2>
     <form th:action="@{/api/stocks/buy}" method="post">
@@ -25,7 +58,7 @@
         <button type="submit">Sell</button>
     </form>
 
-    <!-- Секция для отображения акций пользователя -->
+    <!-- Секция для отображения позиций пользователя -->
     <h2>Your Stocks</h2>
     <div th:if="${#lists.isEmpty(stocks)}">
         <p>You have no stocks in this tournament.</p>
@@ -34,19 +67,82 @@
         <table>
             <thead>
             <tr>
-                <th>Ticker</th>
-                <th>Quantity</th>
+                <th>Symbol</th>
+                <th>Description</th>
+                <th>Current Price</th>
+                <th>Today's Change</th>
+                <th>Purchase Price</th>
+                <th>QTY</th>
+                <th>Total Value</th>
+                <th>Total Gain/Loss</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="entry : ${stocks}">
-                <td th:text="${entry.key}"></td>
-                <td th:text="${entry.value}"></td>
+            <tr th:each="pos : ${stocks}">
+                <td th:text="${pos.ticker}"></td>
+                <td th:text="${pos.description}"></td>
+                <td th:text="'₽' + ${pos.currentPrice}"></td>
+                <td>
+                    <!-- Абсолютное изменение -->
+                    <span th:text="'₽' + ${pos.todayChange}"
+                          th:classappend="${pos.todayChange >= 0} ? 'text-green' : 'text-red'"></span>
+                    <span th:if="${pos.todayChange >= 0}" class="arrow-up">▲</span>
+                    <span th:if="${pos.todayChange < 0}" class="arrow-down">▼</span>
+                    &nbsp;
+                    <!-- Процентное изменение -->
+                    <span th:text="'(' + ${pos.todayChangePct} + '%)'"
+                          th:classappend="${pos.todayChangePct >= 0} ? 'text-green' : 'text-red'"></span>
+                    <span th:if="${pos.todayChangePct >= 0}" class="arrow-up">▲</span>
+                    <span th:if="${pos.todayChangePct < 0}" class="arrow-down">▼</span>
+                </td>
+                <td th:text="'₽' + ${pos.purchasePrice}"></td>
+                <td th:text="${pos.quantity}"></td>
+                <td th:text="'₽' + ${pos.totalValue}"></td>
+                <td>
+                    <span th:text="'₽' + ${pos.totalGainLoss}"
+                          th:classappend="${pos.totalGainLoss >= 0} ? 'text-green' : 'text-red'"></span>
+                    <span th:if="${pos.totalGainLoss >= 0}" class="arrow-up">▲</span>
+                    <span th:if="${pos.totalGainLoss < 0}" class="arrow-down">▼</span>
+                    &nbsp;
+                    <span th:text="'(' + ${pos.totalGainLossPercent} + '%)'"
+                          th:classappend="${pos.totalGainLossPercent >= 0} ? 'text-green' : 'text-red'"></span>
+                    <span th:if="${pos.totalGainLossPercent >= 0}" class="arrow-up">▲</span>
+                    <span th:if="${pos.totalGainLossPercent < 0}" class="arrow-down">▼</span>
+                </td>
             </tr>
             </tbody>
         </table>
     </div>
-    
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+        crossorigin="anonymous"></script>
+
+<script>
+    console.log("Скрипт автокомплита запущен")
+    $(function() {
+        console.log("jQuery ready сработал");
+        // Ищем поле <input> name="ticker" (или id="tickerInput")
+        $('input[name="ticker"]').autocomplete({
+            source: function(request, response) {
+                // request.term = текст, который ввёл пользователь
+                // Делаем AJAX на наш /api/stocks/search
+                $.ajax({
+                    url: '/api/stocks/search',
+                    data: {
+                        term: request.term  // передаём "term" параметр
+                    },
+                    success: function(data) {
+                        // data = ["SBER","SBERP"] ...
+                        response(data);
+                    }
+                });
+            },
+            minLength: 1 // начинать автокомплит при вводе >=1 символа
+        });
+    });
+</script>
 </body>
 </html>

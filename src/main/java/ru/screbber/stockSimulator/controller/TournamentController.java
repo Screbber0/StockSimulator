@@ -6,11 +6,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.screbber.stockSimulator.dto.CreateTournamentDto;
+import ru.screbber.stockSimulator.dto.StockPositionDto;
 import ru.screbber.stockSimulator.service.StockTradingService;
 import ru.screbber.stockSimulator.service.TournamentService;
 
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.List;
 
 @Controller
 @RequestMapping("tournament")
@@ -50,13 +51,14 @@ public class TournamentController {
     @GetMapping("/{tournamentId}")
     public String tournament(@PathVariable Long tournamentId, Model model) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
         BigDecimal balance = tournamentService.getUserBalanceInTournament(username, tournamentId);
         Long participationId = tournamentService.getParticipationByUsernameAndTournamentId(username, tournamentId);
-        Map<String, Integer> userStocks = stockTradingService.getUserStocks(participationId);
+        List<StockPositionDto> userStockPositions = stockTradingService.getUserStockPositions(participationId);
 
         model.addAttribute("tournamentId", tournamentId);
         model.addAttribute("balance", balance);
-        model.addAttribute("stocks", userStocks);
+        model.addAttribute("stocks", userStockPositions);
 
         return "tournament";
     }

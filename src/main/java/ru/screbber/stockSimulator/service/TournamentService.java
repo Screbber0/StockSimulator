@@ -17,5 +17,5 @@ public interface TournamentService {
 
     BigDecimal getUserBalanceInTournament(String username, Long tournamentId);
 
-    Long getParticipationByUsernameAndTournamentId(String username, Long tournamentId) throws Exception;
+    Long getParticipationByUsernameAndTournamentId(String username, Long tournamentId);
 }

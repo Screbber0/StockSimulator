@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import ru.screbber.stockSimulator.entity.RegistrationDto;
+import ru.screbber.stockSimulator.dto.RegistrationDto;
 import ru.screbber.stockSimulator.service.UserService;
 
 @Controller

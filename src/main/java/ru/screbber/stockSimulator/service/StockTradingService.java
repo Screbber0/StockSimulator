@@ -1,13 +1,14 @@
 package ru.screbber.stockSimulator.service;
 
-import java.util.Map;
+import ru.screbber.stockSimulator.dto.StockPositionDto;
+
+import java.util.List;
 
 public interface StockTradingService {
 
-    void buyStock(Long participationId, String ticker, int quantity) throws Exception;
+    void buyStock(Long participationId, String ticker, int quantity);
 
-    void sellStock(Long participationId, String ticker, int quantity) throws Exception;
+    void sellStock(Long participationId, String ticker, int quantity);
 
-    Map<String, Integer> getUserStocks(Long participationId) throws Exception;
-
+    List<StockPositionDto> getUserStockPositions(Long participationId);
 }
