@@ -40,7 +40,9 @@
 <body>
 <div class="tournament-container">
     <h1>Tournament</h1>
+    <p>Total Balance: <span th:text="${totalBalance}">0</span></p>
     <p>Current Cash: <span th:text="${cash}">0</span></p>
+    <p>Your Rank: <span th:text="${rank}"></span></p>
 
     <h2>Buy Stocks</h2>
     <form th:action="@{/api/stocks/buy}" method="post">

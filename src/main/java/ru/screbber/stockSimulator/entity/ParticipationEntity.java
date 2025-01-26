@@ -2,6 +2,7 @@ package ru.screbber.stockSimulator.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Data
 @ToString(exclude = {"stockPositions"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "participation")
 public class ParticipationEntity {

@@ -2,16 +2,18 @@ package ru.screbber.stockSimulator.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import ru.screbber.stockSimulator.constants.TournamentMode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @ToString(exclude = {"participants"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "tournament")
 public class TournamentEntity {
@@ -20,6 +22,7 @@ public class TournamentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String name;
 
     private LocalDate startDate;
@@ -36,5 +39,5 @@ public class TournamentEntity {
     private Integer randomStocksCount;
 
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ParticipationEntity> participants = new HashSet<>();
+    private List<ParticipationEntity> participants = new ArrayList<>();
 }

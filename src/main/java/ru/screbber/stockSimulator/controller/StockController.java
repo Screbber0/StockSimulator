@@ -35,7 +35,7 @@ public class StockController {
     @PostMapping("/buy")
     public String buyStock(@RequestParam Long tournamentId, @RequestParam String ticker, @RequestParam int quantity) {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long participationId = tournamentService.getParticipationByUsernameAndTournamentId(username, tournamentId);
+            Long participationId = tournamentService.getParticipationIdByUsernameAndTournamentId(username, tournamentId);
 
             stockTradingService.buyStock(participationId, ticker, quantity);
             return "redirect:/tournament/" + tournamentId;
@@ -46,7 +46,7 @@ public class StockController {
     public String sellStock(@RequestParam Long tournamentId, @RequestParam String ticker, @RequestParam int quantity) {
         try {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long participationId = tournamentService.getParticipationByUsernameAndTournamentId(username, tournamentId);
+            Long participationId = tournamentService.getParticipationIdByUsernameAndTournamentId(username, tournamentId);
 
             stockTradingService.sellStock(participationId, ticker, quantity);
             return "redirect:/tournament/" + tournamentId;

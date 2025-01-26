@@ -74,10 +74,8 @@ public class ParseMOEXStockService implements ParseStockService {
 
     @Override
     public List<String> findTickersByPrefix(String prefix) {
-        String upper = prefix.toUpperCase();
-        return stockRepository.findStockEntitiesByTickerStartingWith(prefix).stream()
+        return stockRepository.findByTickerStartingWith(prefix.toUpperCase()).stream()
                 .map(StockEntity::getTicker)
-                .filter(ticker -> ticker.startsWith(upper))
                 .limit(5)
                 .toList();
     }

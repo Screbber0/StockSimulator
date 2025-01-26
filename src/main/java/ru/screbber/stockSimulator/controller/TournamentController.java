@@ -38,10 +38,10 @@ public class TournamentController {
     }
 
     @PostMapping("/join")
-    public String joinTournament(@RequestParam Long tournamentId) {
+    public String joinTournament(@RequestParam String tournamentName) {
         try {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            tournamentService.joinTournament(username, tournamentId);
+            tournamentService.joinTournament(username, tournamentName);
             return "redirect:/dashboard";
         } catch (Exception e) {
             return "error";
@@ -51,15 +51,26 @@ public class TournamentController {
     @GetMapping("/{tournamentId}")
     public String tournament(@PathVariable Long tournamentId, Model model) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long participationId = tournamentService.getParticipationIdByUsernameAndTournamentId(username, tournamentId);
 
-        BigDecimal cash = tournamentService.getUserCashInTournament(username, tournamentId);
-        Long participationId = tournamentService.getParticipationByUsernameAndTournamentId(username, tournamentId);
+        BigDecimal cash = tournamentService.getUserCashByParticipationId(participationId);
         List<StockPositionDto> userStockPositions = stockTradingService.getUserStockPositions(participationId);
+        BigDecimal totalBalance = tournamentService.getUserTotalBalanceByParticipationIdAndUserStockPositionList(participationId, userStockPositions);
+
+        Long rank = tournamentService.getRankingByParticipation(participationId);
 
         model.addAttribute("tournamentId", tournamentId);
         model.addAttribute("cash", cash);
+        model.addAttribute("totalBalance", totalBalance);
         model.addAttribute("stocks", userStockPositions);
+        model.addAttribute("rank", rank);
 
         return "tournament";
+    }
+
+    @GetMapping("/search")
+    @ResponseBody
+    public List<String> searchTickers(@RequestParam String term) {
+        return tournamentService.findTickersByPrefix(term);
     }
 }

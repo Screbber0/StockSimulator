@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Dashboard</title>
+    <link rel="stylesheet"
+          href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
 <!--    <link rel="stylesheet" th:href="@{/css/common.css}">-->
 </head>
 <body>
@@ -14,7 +16,7 @@
     </a>
 
     <form th:action="@{/tournament/join}" method="post">
-        <input type="text" name="tournamentId" placeholder="Enter Tournament ID">
+        <input type="text" name="tournamentName" placeholder="Enter Tournament ID">
         <button type="submit">Join Tournament</button>
     </form>
 
@@ -27,5 +29,34 @@
     </ul>
 
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+        crossorigin="anonymous"></script>
+
+<script>
+    console.log("Скрипт автокомплита запущен")
+    $(function() {
+        console.log("jQuery ready сработал");
+        $('input[name="tournamentName"]').autocomplete({
+            source: function(request, response) {
+                // request.term = текст, который ввёл пользователь
+                // Делаем AJAX на наш /api/stocks/search
+                $.ajax({
+                    url: '/tournament/search',
+                    data: {
+                        term: request.term  // передаём "term" параметр
+                    },
+                    success: function(data) {
+                        // data = ["SBER","SBERP"] ...
+                        response(data);
+                    }
+                });
+            },
+            minLength: 1 // начинать автокомплит при вводе >=1 символа
+        });
+    });
+</script>
 </body>
 </html>
