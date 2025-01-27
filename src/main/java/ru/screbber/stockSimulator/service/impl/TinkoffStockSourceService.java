@@ -3,6 +3,8 @@ package ru.screbber.stockSimulator.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 import ru.screbber.stockSimulator.dto.StockInfoDto;
 import ru.screbber.stockSimulator.exception.StockNotFoundException;
@@ -21,15 +23,15 @@ import static ru.tinkoff.piapi.core.utils.MapperUtils.quotationToBigDecimal;
 
 @Service
 @RequiredArgsConstructor
+@EnableCaching
 public class TinkoffStockSourceService implements StockSourceService {
 
     private final InvestApi api;
 
-    private static final List<String> ALL_TICKERS = List.of("SBER", "SBERP", "GAZP", "YNDX", "AAPL", "NVDA");
-
     static final Logger log = LoggerFactory.getLogger(TinkoffStockSourceService.class);
 
     @Override
+    @Cacheable(value = "stockPrices", key = "#ticker.toUpperCase()")
     public BigDecimal getStockPriceByTicker(String ticker) {
         // TODO: изменить весь метод
         Share share = api.getInstrumentsService().getShareByTickerSync(ticker, MOEX.getValue());
