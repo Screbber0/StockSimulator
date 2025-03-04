@@ -1,9 +1,10 @@
-package ru.screbber.stockSimulator.entity;
+package ru.screbber.stockSimulator.entity.stock;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
+import ru.screbber.stockSimulator.entity.ParticipationEntity;
 
 import java.math.BigDecimal;
 

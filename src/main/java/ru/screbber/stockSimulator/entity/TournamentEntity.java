@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import ru.screbber.stockSimulator.constants.TournamentMode;
+import ru.screbber.stockSimulator.entity.stock.StockEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,4 +41,19 @@ public class TournamentEntity {
 
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ParticipationEntity> participants = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "tournament_allowed_stocks",
+            joinColumns = @JoinColumn(name = "tournament_id"),
+            inverseJoinColumns = @JoinColumn(name = "stock_id")
+    )
+    private List<StockEntity> allowedStocks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamEntity> teams = new ArrayList<>();
+
+    private Integer maxTeams;
+
+    private Integer maxTeamSize;
 }

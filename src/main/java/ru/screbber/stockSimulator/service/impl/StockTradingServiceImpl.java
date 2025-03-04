@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.screbber.stockSimulator.dto.StockPositionDto;
 import ru.screbber.stockSimulator.entity.ParticipationEntity;
-import ru.screbber.stockSimulator.entity.StockPositionEntity;
+import ru.screbber.stockSimulator.entity.stock.StockPositionEntity;
 import ru.screbber.stockSimulator.exception.InsufficientCashException;
 import ru.screbber.stockSimulator.exception.NoSuchTickerInYourPortfolioException;
 import ru.screbber.stockSimulator.exception.NotEnoughStocksToSellException;

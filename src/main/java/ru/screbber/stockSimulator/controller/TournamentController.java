@@ -70,7 +70,7 @@ public class TournamentController {
 
     @GetMapping("/search")
     @ResponseBody
-    public List<String> searchTickers(@RequestParam String term) {
+    public List<String> searchTournamentByPrefix(@RequestParam String term) {
         return tournamentService.findTickersByPrefix(term);
     }
 }

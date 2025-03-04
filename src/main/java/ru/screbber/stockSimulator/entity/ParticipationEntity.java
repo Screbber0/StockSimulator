@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import ru.screbber.stockSimulator.entity.stock.StockPositionEntity;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -32,4 +33,9 @@ public class ParticipationEntity {
 
     @OneToMany(mappedBy = "participation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StockPositionEntity> stockPositions = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private TeamEntity team;
+
 }

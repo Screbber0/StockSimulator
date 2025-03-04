@@ -1,7 +1,7 @@
 package ru.screbber.stockSimulator.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.screbber.stockSimulator.entity.StockEntity;
+import ru.screbber.stockSimulator.entity.stock.StockEntity;
 
 import java.util.List;
 

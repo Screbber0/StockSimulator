@@ -3,7 +3,7 @@ package ru.screbber.stockSimulator.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.screbber.stockSimulator.entity.StockEntity;
+import ru.screbber.stockSimulator.entity.stock.StockEntity;
 import ru.screbber.stockSimulator.repository.StockRepository;
 import ru.screbber.stockSimulator.service.ParseStockService;
 

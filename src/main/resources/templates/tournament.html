@@ -5,115 +5,245 @@
     <link rel="stylesheet"
           href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
     <style>
-        .text-green {
-            color: green;
-        }
-        .text-red {
-            color: red;
-        }
-
-        .arrow-up, .arrow-down {
-            font-size: 12px; /* Размер стрелки */
-            margin-left: -3px;
-            padding: 0; /* Убираем внутренние отступы */
-            vertical-align: baseline; /* Выравнивание по линии текста */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
 
-        .arrow-up {
-            color: green; /* Цвет стрелки вверх */
+        .tournament-container {
+            background: #ffffff;
+            margin-top: 40px;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
         }
 
-        .arrow-down {
-            color: red; /* Цвет стрелки вниз */
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #444;
+        }
+
+        .trade-forms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .trade-block {
+            flex: 1 1 280px;
+            background: #f7f9fc;
+            padding: 20px;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .trade-block h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .trade-block form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .trade-block input[type="text"],
+        .trade-block input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .trade-block button {
+            padding: 10px 15px;
+            font-size: 14px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .trade-block button:hover {
+            background-color: #0056b3;
         }
 
         table {
             border-collapse: collapse;
+            width: 100%;
         }
+
         table th,
         table td {
             border: 1px solid #ccc;
-            padding: 8px;
+            padding: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        thead {
+            background-color: #f0f2f5;
+        }
+
+        th {
+            color: #555;
+        }
+
+        .text-green {
+            color: green;
+        }
+
+        .text-red {
+            color: red;
+        }
+
+        .arrow-up,
+        .arrow-down {
+            font-size: 12px;
+            padding: 0;
+            vertical-align: baseline;
+        }
+
+        .arrow-up {
+            color: green;
+        }
+
+        .arrow-down {
+            color: red;
+        }
+
+        .stocks-block h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .info-panel {
+            margin-bottom: 20px;
+        }
+
+        .info-panel p {
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
 <div class="tournament-container">
     <h1>Tournament</h1>
-    <p>Total Balance: <span th:text="${totalBalance}">0</span></p>
-    <p>Current Cash: <span th:text="${cash}">0</span></p>
-    <p>Your Rank: <span th:text="${rank}"></span></p>
-
-    <h2>Buy Stocks</h2>
-    <form th:action="@{/api/stocks/buy}" method="post">
-        <input type="hidden" name="tournamentId" th:value="${tournamentId}">
-        <input type="text" name="ticker" placeholder="Ticker">
-        <input type="number" name="quantity" placeholder="Quantity">
-        <button type="submit">Buy</button>
-    </form>
-
-    <h2>Sell Stocks</h2>
-    <form th:action="@{/api/stocks/sell}" method="post">
-        <input type="hidden" name="tournamentId" th:value="${tournamentId}">
-        <input type="text" name="ticker" placeholder="Ticker">
-        <input type="number" name="quantity" placeholder="Quantity">
-        <button type="submit">Sell</button>
-    </form>
-
-    <!-- Секция для отображения позиций пользователя -->
-    <h2>Your Stocks</h2>
-    <div th:if="${#lists.isEmpty(stocks)}">
-        <p>You have no stocks in this tournament.</p>
+    <div class="info-panel">
+        <p>Total Balance: <strong><span th:text="${totalBalance}">0</span></strong></p>
+        <p>Current Cash: <strong><span th:text="${cash}">0</span></strong></p>
+        <p>Your Rank: <strong><span th:text="${rank}">N/A</span></strong></p>
     </div>
-    <div th:unless="${#lists.isEmpty(stocks)}">
-        <table>
-            <thead>
-            <tr>
-                <th>Symbol</th>
-                <th>Description</th>
-                <th>Current Price</th>
-                <th>Today's Change</th>
-                <th>Purchase Price</th>
-                <th>QTY</th>
-                <th>Total Value</th>
-                <th>Total Gain/Loss</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="pos : ${stocks}">
-                <td th:text="${pos.ticker}"></td>
-                <td th:text="${pos.description}"></td>
-                <td th:text="'₽' + ${pos.currentPrice}"></td>
-                <td>
-                    <!-- Абсолютное изменение -->
-                    <span th:text="'₽' + ${pos.todayChange}"
-                          th:classappend="${pos.todayChange >= 0} ? 'text-green' : 'text-red'"></span>
-                    <span th:if="${pos.todayChange >= 0}" class="arrow-up">▲</span>
-                    <span th:if="${pos.todayChange < 0}" class="arrow-down">▼</span>
-                    &nbsp;
-                    <!-- Процентное изменение -->
-                    <span th:text="'(' + ${pos.todayChangePct} + '%)'"
-                          th:classappend="${pos.todayChangePct >= 0} ? 'text-green' : 'text-red'"></span>
-                    <span th:if="${pos.todayChangePct >= 0}" class="arrow-up">▲</span>
-                    <span th:if="${pos.todayChangePct < 0}" class="arrow-down">▼</span>
-                </td>
-                <td th:text="'₽' + ${pos.purchasePrice}"></td>
-                <td th:text="${pos.quantity}"></td>
-                <td th:text="'₽' + ${pos.totalValue}"></td>
-                <td>
-                    <span th:text="'₽' + ${pos.totalGainLoss}"
-                          th:classappend="${pos.totalGainLoss >= 0} ? 'text-green' : 'text-red'"></span>
-                    <span th:if="${pos.totalGainLoss >= 0}" class="arrow-up">▲</span>
-                    <span th:if="${pos.totalGainLoss < 0}" class="arrow-down">▼</span>
-                    &nbsp;
-                    <span th:text="'(' + ${pos.totalGainLossPercent} + '%)'"
-                          th:classappend="${pos.totalGainLossPercent >= 0} ? 'text-green' : 'text-red'"></span>
-                    <span th:if="${pos.totalGainLossPercent >= 0}" class="arrow-up">▲</span>
-                    <span th:if="${pos.totalGainLossPercent < 0}" class="arrow-down">▼</span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+
+    <div class="trade-forms">
+        <div class="trade-block">
+            <h2>Buy Stocks</h2>
+            <form th:action="@{/api/stocks/buy}" method="post">
+                <input type="hidden" name="tournamentId" th:value="${tournamentId}">
+                <input type="text" name="ticker" placeholder="Ticker" required>
+                <input type="number" name="quantity" placeholder="Quantity" min="1" required>
+                <button type="submit">Buy</button>
+            </form>
+        </div>
+
+        <div class="trade-block">
+            <h2>Sell Stocks</h2>
+            <form th:action="@{/api/stocks/sell}" method="post">
+                <input type="hidden" name="tournamentId" th:value="${tournamentId}">
+                <input type="text" name="ticker" placeholder="Ticker" required>
+                <input type="number" name="quantity" placeholder="Quantity" min="1" required>
+                <button type="submit">Sell</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="stocks-block">
+        <h2>Your Stocks</h2>
+        <div th:if="${#lists.isEmpty(stocks)}">
+            <p>You have no stocks in this tournament.</p>
+        </div>
+        <div th:unless="${#lists.isEmpty(stocks)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <!-- Закомментировали столбец Description -->
+                    <!-- <th>Description</th> -->
+                    <th>Current Price</th>
+                    <!-- Закомментировали столбец Today's Change -->
+                    <!-- <th>Today's Change</th> -->
+                    <th>Purchase Price</th>
+                    <th>QTY</th>
+                    <th>Total Value</th>
+                    <th>Total Gain/Loss</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pos : ${stocks}">
+                    <td th:text="${pos.ticker}"></td>
+
+                    <!-- Закомментировали ячейку с Description -->
+                    <!-- <td th:text="${pos.description}"></td> -->
+
+                    <td th:text="'₽' + ${pos.currentPrice}">0</td>
+
+                    <!-- Закомментировали ячейку с Today's Change -->
+                    <!--
+                    <td>
+                        <span th:text="'₽' + ${pos.todayChange}"
+                              th:classappend="${pos.todayChange >= 0} ? 'text-green' : 'text-red'"></span>
+                        <span th:if="${pos.todayChange >= 0}" class="arrow-up">▲</span>
+                        <span th:if="${pos.todayChange < 0}" class="arrow-down">▼</span>
+                        &nbsp;
+                        <span th:text="'(' + ${pos.todayChangePct} + '%)'"
+                              th:classappend="${pos.todayChangePct >= 0} ? 'text-green' : 'text-red'"></span>
+                        <span th:if="${pos.todayChangePct >= 0}" class="arrow-up">▲</span>
+                        <span th:if="${pos.todayChangePct < 0}" class="arrow-down">▼</span>
+                    </td>
+                    -->
+
+                    <td th:text="'₽' + ${pos.purchasePrice}">0</td>
+                    <td th:text="${pos.quantity}">0</td>
+                    <td th:text="'₽' + ${pos.totalValue}">0</td>
+                    <td>
+                        <span th:text="'₽' + ${pos.totalGainLoss}"
+                              th:classappend="${pos.totalGainLoss >= 0} ? 'text-green' : 'text-red'"></span>
+                        <span th:if="${pos.totalGainLoss >= 0}" class="arrow-up">▲</span>
+                        <span th:if="${pos.totalGainLoss < 0}" class="arrow-down">▼</span>
+                        &nbsp;
+                        <span th:text="'(' + ${pos.totalGainLossPercent} + '%)'"
+                              th:classappend="${pos.totalGainLossPercent >= 0} ? 'text-green' : 'text-red'"></span>
+                        <span th:if="${pos.totalGainLossPercent >= 0}" class="arrow-up">▲</span>
+                        <span th:if="${pos.totalGainLossPercent < 0}" class="arrow-down">▼</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -123,26 +253,20 @@
         crossorigin="anonymous"></script>
 
 <script>
-    console.log("Скрипт автокомплита запущен")
+    console.log("Скрипт автокомплита запущен");
+
     $(function() {
-        console.log("jQuery ready сработал");
-        // Ищем поле <input> name="ticker" (или id="tickerInput")
         $('input[name="ticker"]').autocomplete({
             source: function(request, response) {
-                // request.term = текст, который ввёл пользователь
-                // Делаем AJAX на наш /api/stocks/search
                 $.ajax({
                     url: '/api/stocks/search',
-                    data: {
-                        term: request.term  // передаём "term" параметр
-                    },
+                    data: { term: request.term },
                     success: function(data) {
-                        // data = ["SBER","SBERP"] ...
                         response(data);
                     }
                 });
             },
-            minLength: 1 // начинать автокомплит при вводе >=1 символа
+            minLength: 1
         });
     });
 </script>

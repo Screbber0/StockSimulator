@@ -1,4 +1,4 @@
-package ru.screbber.stockSimulator.entity;
+package ru.screbber.stockSimulator.entity.stock;
 
 import jakarta.persistence.*;
 import lombok.Data;
