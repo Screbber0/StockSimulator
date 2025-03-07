@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Data
-public class StockPositionDto {
+public class ParticipantStockPositionDto {
 
     private String ticker;            // "AAPL"
 

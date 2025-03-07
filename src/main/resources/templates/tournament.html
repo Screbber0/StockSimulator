@@ -148,6 +148,20 @@
         .info-panel p {
             margin: 5px 0;
         }
+
+        .chart-block {
+            margin-top: 40px;
+        }
+        .chart-block h2 {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        #chartTournamentPrice {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -157,6 +171,9 @@
         <p>Total Balance: <strong><span th:text="${totalBalance}">0</span></strong></p>
         <p>Current Cash: <strong><span th:text="${cash}">0</span></strong></p>
         <p>Your Rank: <strong><span th:text="${rank}">N/A</span></strong></p>
+        <a th:href="@{/tournament/{tournamentId}/ranking(tournamentId=${tournamentId})}">
+            View All Participants
+        </a>
     </div>
 
     <div class="trade-forms">
@@ -245,14 +262,20 @@
             </table>
         </div>
     </div>
+    <div class="chart-block">
+        <h2>Price History</h2>
+        <canvas id="chartTournamentPrice" width="600" height="300"></canvas>
+    </div>
 </div>
 
+<!-- Подключаем нужные библиотеки -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
         crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
+<script th:inline="javascript">
     console.log("Скрипт автокомплита запущен");
 
     $(function() {
@@ -267,6 +290,43 @@
                 });
             },
             minLength: 1
+        });
+    });
+
+    // Подставляем строку JSON от Thymeleaf
+    let rawHistory = /*[[${historyDataJson}]]*/ '[]';
+    // Теперь rawHistory – строка. Пример: "[{\"date\":\"2025-02-01\",\"price\":100000.0}, ...]"
+
+    // Превращаем строку JSON в JS-массив
+    let historyArray = JSON.parse(rawHistory);
+
+    console.log(historyArray);
+
+    let labels = historyArray.map(item => item.date);
+    let dataValues = historyArray.map(item => item.price);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        let ctx = document.getElementById('chartTournamentPrice').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Tournament Price',
+                    data: dataValues,
+                    borderWidth: 2,
+                    borderColor: 'blue',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
         });
     });
 </script>

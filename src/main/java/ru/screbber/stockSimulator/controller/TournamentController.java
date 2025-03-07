@@ -1,12 +1,15 @@
 package ru.screbber.stockSimulator.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.screbber.stockSimulator.dto.CreateTournamentDto;
-import ru.screbber.stockSimulator.dto.StockPositionDto;
+import ru.screbber.stockSimulator.dto.ParticipantStockPositionDto;
+import ru.screbber.stockSimulator.dto.ParticipationHistoryPointDto;
+import ru.screbber.stockSimulator.dto.RankingParticipantDto;
 import ru.screbber.stockSimulator.service.StockTradingService;
 import ru.screbber.stockSimulator.service.TournamentService;
 
@@ -30,7 +33,8 @@ public class TournamentController {
     @PostMapping("/create")
     public String createTournament(@ModelAttribute CreateTournamentDto createTournamentDto) {
         try {
-            tournamentService.createTournament(createTournamentDto);
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            tournamentService.createTournamentAndJoin(createTournamentDto, username);
             return "redirect:/dashboard";
         } catch (Exception e) {
             return "redirect:/dashboard";
@@ -54,18 +58,33 @@ public class TournamentController {
         Long participationId = tournamentService.getParticipationIdByUsernameAndTournamentId(username, tournamentId);
 
         BigDecimal cash = tournamentService.getUserCashByParticipationId(participationId);
-        List<StockPositionDto> userStockPositions = stockTradingService.getUserStockPositions(participationId);
+        List<ParticipantStockPositionDto> userStockPositions = stockTradingService.getUserStockPositions(participationId);
         BigDecimal totalBalance = tournamentService.getUserTotalBalanceByParticipationIdAndUserStockPositionList(participationId, userStockPositions);
-
         Long rank = tournamentService.getRankingByParticipation(participationId);
 
         model.addAttribute("tournamentId", tournamentId);
         model.addAttribute("cash", cash);
-        model.addAttribute("totalBalance", totalBalance);
         model.addAttribute("stocks", userStockPositions);
+        model.addAttribute("totalBalance", totalBalance);
         model.addAttribute("rank", rank);
 
+        List<ParticipationHistoryPointDto> historyData = tournamentService.getParticipationHistory(participationId);
+        ObjectMapper mapper = new ObjectMapper();
+        String historyDataJson = mapper.writeValueAsString(historyData);
+        model.addAttribute("historyDataJson", historyDataJson);
+
         return "tournament";
+    }
+
+    @GetMapping("/{tournamentId}/ranking")
+    public String tournamentRanking(@PathVariable Long tournamentId, Model model) {
+        // Сервис вернёт список всех участников с их балансами и позициями
+        List<RankingParticipantDto> rankingList = tournamentService.getTournamentRankingList(tournamentId);
+
+        // Передаём в модель
+        model.addAttribute("rankingList", rankingList);
+        model.addAttribute("tournamentId", tournamentId);
+        return "tournamentRanking"; // название нового шаблона
     }
 
     @GetMapping("/search")

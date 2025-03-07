@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tournament Ranking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .ranking-container {
+            background: #ffffff;
+            margin-top: 40px;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table th,
+        table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        thead {
+            background-color: #f0f2f5;
+        }
+        th {
+            color: #555;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="ranking-container">
+    <h1>Ranking</h1>
+
+    <!-- Кнопка/ссылка вернуться -->
+    <a th:href="@{/tournament/{tournamentId}(tournamentId=${tournamentId})}" class="back-link">Back to Tournament</a>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Position</th>
+            <th>Username</th>
+            <th>Total Balance</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="participant : ${rankingList}">
+            <td th:text="${participant.rankPosition}">1</td>
+            <td th:text="${participant.username}">username</td>
+            <td th:text="'₽ ' + ${participant.totalBalance}">0</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

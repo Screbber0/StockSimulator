@@ -2,7 +2,7 @@ package ru.screbber.stockSimulator.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.screbber.stockSimulator.dto.StockPositionDto;
+import ru.screbber.stockSimulator.dto.ParticipantStockPositionDto;
 import ru.screbber.stockSimulator.entity.ParticipationEntity;
 import ru.screbber.stockSimulator.entity.stock.StockPositionEntity;
 import ru.screbber.stockSimulator.exception.InsufficientCashException;
@@ -26,7 +26,6 @@ public class StockTradingServiceImpl implements StockTradingService {
 
     private final StockSourceService stockSourceService;
 
-    // TODO: подумать про индекс над тикером
     @Override
     public void buyStock(Long participationId, String ticker, int quantity) {
         ParticipationEntity participation = participationRepository.findById(participationId)
@@ -107,13 +106,13 @@ public class StockTradingServiceImpl implements StockTradingService {
     }
 
     @Override
-    public List<StockPositionDto> getUserStockPositions(Long participationId) {
+    public List<ParticipantStockPositionDto> getUserStockPositions(Long participationId) {
         ParticipationEntity participation = participationRepository.findById(participationId)
                 .orElseThrow(() -> new RuntimeException("Participation not found"));
 
         // Проходимся по всем StockPositionEntity и собираем DTO
         List<StockPositionEntity> positions = participation.getStockPositions();
-        List<StockPositionDto> result = new ArrayList<>();
+        List<ParticipantStockPositionDto> result = new ArrayList<>();
 
         for (StockPositionEntity pos : positions) {
             String ticker = pos.getTicker();
@@ -125,7 +124,7 @@ public class StockTradingServiceImpl implements StockTradingService {
             BigDecimal stockPriceByTicker = stockSourceService.getStockPriceByTicker(ticker);
 
 
-            StockPositionDto dto = new StockPositionDto();
+            ParticipantStockPositionDto dto = new ParticipantStockPositionDto();
             dto.setTicker(ticker);
             // dto.setDescription(details.getName());
             //dto.setCurrentPrice(details.getCurrentPrice());

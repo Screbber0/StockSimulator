@@ -1,16 +1,13 @@
 package ru.screbber.stockSimulator.service;
 
-import ru.screbber.stockSimulator.dto.CreateTournamentDto;
-import ru.screbber.stockSimulator.dto.ParticipationDto;
-import ru.screbber.stockSimulator.dto.StockPositionDto;
-import ru.screbber.stockSimulator.dto.TournamentDto;
+import ru.screbber.stockSimulator.dto.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface TournamentService {
 
-    void createTournament(CreateTournamentDto dto);
+    void createTournamentAndJoin(CreateTournamentDto createTournamentDto, String username);
 
     ParticipationDto joinTournament(String username, String tournamentName);
 
@@ -18,11 +15,17 @@ public interface TournamentService {
 
     BigDecimal getUserCashByParticipationId(Long participationId);
 
-    BigDecimal getUserTotalBalanceByParticipationIdAndUserStockPositionList(Long participationId, List<StockPositionDto> userStockPositions);
+    BigDecimal getUserTotalBalanceByParticipationIdAndUserStockPositionList(Long participationId, List<ParticipantStockPositionDto> userStockPositions);
+
+    BigDecimal getUserTotalBalanceByParticipationId(Long participationId);
 
     Long getParticipationIdByUsernameAndTournamentId(String username, Long tournamentId);
 
     Long getRankingByParticipation(Long participationId);
+
+    List<RankingParticipantDto> getTournamentRankingList(Long tournamentId);
+
+    List<ParticipationHistoryPointDto> getParticipationHistory(Long participationId);
 
     /**
      * Найти турнир по префиксу

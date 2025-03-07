@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.screbber.stockSimulator.dto.*;
 import ru.screbber.stockSimulator.entity.ParticipationEntity;
+import ru.screbber.stockSimulator.entity.ParticipationHistoryEntity;
 import ru.screbber.stockSimulator.entity.TournamentEntity;
 import ru.screbber.stockSimulator.entity.UserEntity;
 import ru.screbber.stockSimulator.entity.stock.StockPositionEntity;
+import ru.screbber.stockSimulator.repository.ParticipationHistoryRepository;
 import ru.screbber.stockSimulator.repository.ParticipationRepository;
 import ru.screbber.stockSimulator.repository.TournamentRepository;
 import ru.screbber.stockSimulator.repository.UserRepository;
@@ -28,10 +30,12 @@ public class TournamentServiceImpl implements TournamentService {
 
     private final TournamentRepository tournamentRepository;
 
+    private final ParticipationHistoryRepository participantHistoryRepository;
+
     private final StockSourceService stockSourceService;
 
     @Override
-    public void createTournament(CreateTournamentDto dto) {
+    public void createTournamentAndJoin(CreateTournamentDto dto, String username) {
         TournamentEntity tournament = new TournamentEntity();
         tournament.setName(dto.getName());
         tournament.setStartDate(dto.getStartDate());
@@ -40,8 +44,16 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setMaxParticipants(dto.getMaxParticipants());
         tournament.setMode(dto.getTournamentMode());
         tournament.setRandomStocksCount(dto.getRandomStocksCount());
-
         tournamentRepository.save(tournament);
+
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ParticipationEntity participation = new ParticipationEntity();
+        participation.setUser(user);
+        participation.setTournament(tournament);
+        participation.setCash(tournament.getInitialCapital());
+        participationRepository.save(participation);
     }
 
     @Override
@@ -95,20 +107,20 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public BigDecimal getUserTotalBalanceByParticipationIdAndUserStockPositionList(Long participationId, List<StockPositionDto> userStockPositions) {
+    public BigDecimal getUserTotalBalanceByParticipationIdAndUserStockPositionList(Long participationId, List<ParticipantStockPositionDto> participantStockPosition) {
         ParticipationEntity participation = participationRepository.findById(participationId)
                 .orElseThrow(() -> new RuntimeException("Participation not found"));
         BigDecimal totalBalance = participation.getCash();
 
-        for (StockPositionDto stockPosition : userStockPositions) {
-            BigDecimal multiply = stockPosition.getCurrentPrice().multiply(new BigDecimal(stockPosition.getQuantity()));
+        for (ParticipantStockPositionDto stockPosition : participantStockPosition) {
+            BigDecimal multiply = stockPosition.getCurrentPrice().multiply(BigDecimal.valueOf(stockPosition.getQuantity()));
             totalBalance = totalBalance.add(multiply);
         }
 
         return totalBalance;
     }
 
-
+    @Override
     public BigDecimal getUserTotalBalanceByParticipationId(Long participationId) {
         ParticipationEntity participation = participationRepository.findById(participationId)
                 .orElseThrow(() -> new RuntimeException("Participation not found"));
@@ -117,8 +129,7 @@ public class TournamentServiceImpl implements TournamentService {
         List<StockPositionEntity> stockPositions = participation.getStockPositions();
         for (StockPositionEntity stockPosition : stockPositions) {
             BigDecimal currentPrice = stockSourceService.getStockPriceByTicker(stockPosition.getTicker());
-            BigDecimal multiply = currentPrice.multiply(new BigDecimal(stockPosition.getQuantity()));
-            totalBalance = totalBalance.add(multiply);
+            totalBalance = totalBalance.add(currentPrice.multiply(BigDecimal.valueOf(stockPosition.getQuantity())));
         }
 
         return totalBalance;
@@ -148,24 +159,74 @@ public class TournamentServiceImpl implements TournamentService {
         List<ParticipationEntity> allParticipants = tournament.getParticipants();
 
         // 4) Считаем totalBalance для каждого участника
-        List<BigDecimal> allBalances = new ArrayList<>();
+        List<BigDecimal> allParticipantsTotalBalances = new ArrayList<>();
 
-        BigDecimal currentUserBalance = getUserTotalBalanceByParticipationId(participationId);
+        BigDecimal currentUserTotalBalance = getUserTotalBalanceByParticipationId(participationId);
 
         // Собираем totalBalance всех
         for (ParticipationEntity p : allParticipants) {
-            BigDecimal bal = getUserTotalBalanceByParticipationId(p.getId());
-            allBalances.add(bal);
+            BigDecimal participantsTotalBalance = getUserTotalBalanceByParticipationId(p.getId());
+            allParticipantsTotalBalances.add(participantsTotalBalance);
         }
 
         // 5) Считаем, сколько имеют баланс больше, чем у текущего
-        long rank = allBalances.stream()
-                .filter(b -> b.compareTo(currentUserBalance) > 0)
+        long rank = allParticipantsTotalBalances.stream()
+                .filter(b -> b.compareTo(currentUserTotalBalance) > 0)
                 .count();
 
         // Ранг = 1 + число участников с большим балансом
         return rank + 1;
     }
+
+    @Override
+    public List<RankingParticipantDto> getTournamentRankingList(Long tournamentId) {
+        // 1) Находим турнир
+        TournamentEntity tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new RuntimeException("Tournament not found"));
+
+        // 2) Получаем всех участников
+        List<ParticipationEntity> participants = tournament.getParticipants();
+
+        // 3) Для каждого считаем totalBalance
+        //    Потом сортируем по убыванию баланса
+        List<RankingParticipantDto> rankingList = new ArrayList<>();
+        for (ParticipationEntity p : participants) {
+            BigDecimal balance = getUserTotalBalanceByParticipationId(p.getId());
+            rankingList.add(new RankingParticipantDto(
+                    p.getUser().getUsername(),
+                    balance,
+                    0L // пока ставим 0, позже назначим rankPosition
+            ));
+        }
+
+        // Сортируем по балансу (desc)
+        rankingList.sort((a, b) -> b.getTotalBalance().compareTo(a.getTotalBalance()));
+
+        // 4) Проставляем rankPosition
+        // Участник с самым большим балансом получает позицию 1, следующий — 2 и т. д.
+        long pos = 1;
+        for (RankingParticipantDto dto : rankingList) {
+            dto.setRankPosition(pos);
+            pos++;
+        }
+
+        return rankingList;
+    }
+
+    @Override
+    public List<ParticipationHistoryPointDto> getParticipationHistory(Long participationId) {
+        List<ParticipationHistoryEntity> records = participantHistoryRepository
+                .findByParticipationIdOrderBySnapshotDateAsc(participationId);
+
+        return records.stream()
+                .map(r -> new ParticipationHistoryPointDto(
+                        r.getSnapshotDate().toString(),
+                        r.getTotalBalance()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
 
     @Override
     public List<String> findTickersByPrefix(String tournamentPrefix) {
