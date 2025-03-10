@@ -3,6 +3,7 @@ package ru.screbber.stockSimulator.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.screbber.stockSimulator.dto.StockSuggestDto;
 import ru.screbber.stockSimulator.entity.stock.StockEntity;
 import ru.screbber.stockSimulator.repository.StockRepository;
 import ru.screbber.stockSimulator.service.ParseStockService;
@@ -73,10 +74,13 @@ public class ParseMOEXStockService implements ParseStockService {
     }
 
     @Override
-    public List<String> findTickersByPrefix(String prefix) {
-        return stockRepository.findByTickerStartingWith(prefix.toUpperCase()).stream()
-                .map(StockEntity::getTicker)
+    public List<StockSuggestDto> findStocksByPrefix(String prefix) {
+        List<StockEntity> stocks = stockRepository.findByTickerOrEmitentNameStartingWith(prefix);
+
+        List<StockSuggestDto> stockSuggestDtos = stocks.stream()
                 .limit(5)
+                .map(s -> new StockSuggestDto(s.getTicker(), s.getEmitentName()))
                 .toList();
+        return stockSuggestDtos;
     }
 }

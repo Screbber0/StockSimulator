@@ -1,5 +1,7 @@
 package ru.screbber.stockSimulator.service;
 
+import ru.screbber.stockSimulator.dto.StockSuggestDto;
+
 import java.util.List;
 
 public interface ParseStockService {
@@ -7,7 +9,7 @@ public interface ParseStockService {
     void processStockFile() throws Exception;
 
     /**
-     * Найти акцию по префиксу тикера (например, "SB" -> "SBER", "SBERP").
+     * Найти акцию по префиксу тикера или названия (например, "SB" -> "SBER", "SBERP").
      */
-    List<String> findTickersByPrefix(String prefix);
+    List<StockSuggestDto> findStocksByPrefix(String prefix);
 }

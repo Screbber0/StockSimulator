@@ -5,6 +5,34 @@
     <link rel="stylesheet"
           href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
     <style>
+        table {
+            /* Ширина таблицы строго 100% */
+            width: 100%;
+            /* Фиксированная раскладка столбцов */
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Делаем колонки Description и Symbol особенными */
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: 20%;
+            word-wrap: break-word;
+        }
+
+        th:nth-child(1),
+        td:nth-child(1) {
+            width: 10%;
+        }
+
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f7fa;
@@ -208,8 +236,7 @@
                 <thead>
                 <tr>
                     <th>Symbol</th>
-                    <!-- Закомментировали столбец Description -->
-                    <!-- <th>Description</th> -->
+                    <th>Description</th>
                     <th>Current Price</th>
                     <!-- Закомментировали столбец Today's Change -->
                     <!-- <th>Today's Change</th> -->
@@ -222,10 +249,7 @@
                 <tbody>
                 <tr th:each="pos : ${stocks}">
                     <td th:text="${pos.ticker}"></td>
-
-                    <!-- Закомментировали ячейку с Description -->
-                    <!-- <td th:text="${pos.description}"></td> -->
-
+                    <td th:text="${pos.description}"></td>
                     <td th:text="'₽' + ${pos.currentPrice}">0</td>
 
                     <!-- Закомментировали ячейку с Today's Change -->
@@ -278,19 +302,25 @@
 <script th:inline="javascript">
     console.log("Скрипт автокомплита запущен");
 
-    $(function() {
-        $('input[name="ticker"]').autocomplete({
-            source: function(request, response) {
-                $.ajax({
-                    url: '/api/stocks/search',
-                    data: { term: request.term },
-                    success: function(data) {
-                        response(data);
-                    }
-                });
-            },
-            minLength: 1
-        });
+    $('input[name="ticker"]').autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: '/api/stocks/search',
+                data: { term: request.term },
+                success: function(data) {
+                    // data – это массив StockSuggestDto
+                    // Преобразуем для автокомплита
+                    let transformed = data.map(item => {
+                        return {
+                            label: item.ticker + " – " + item.emitent,
+                            value: item.ticker  // подставлять именно тикер
+                        };
+                    });
+                    response(transformed);
+                }
+            });
+        },
+        minLength: 1
     });
 
     // Подставляем строку JSON от Thymeleaf

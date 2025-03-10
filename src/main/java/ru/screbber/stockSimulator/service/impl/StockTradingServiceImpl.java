@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.screbber.stockSimulator.dto.ParticipantStockPositionDto;
 import ru.screbber.stockSimulator.entity.ParticipationEntity;
+import ru.screbber.stockSimulator.entity.stock.StockEntity;
 import ru.screbber.stockSimulator.entity.stock.StockPositionEntity;
 import ru.screbber.stockSimulator.exception.InsufficientCashException;
 import ru.screbber.stockSimulator.exception.NoSuchTickerInYourPortfolioException;
 import ru.screbber.stockSimulator.exception.NotEnoughStocksToSellException;
 import ru.screbber.stockSimulator.exception.ParticipationNotFound;
 import ru.screbber.stockSimulator.repository.ParticipationRepository;
+import ru.screbber.stockSimulator.repository.StockRepository;
 import ru.screbber.stockSimulator.service.StockSourceService;
 import ru.screbber.stockSimulator.service.StockTradingService;
 
@@ -23,8 +25,8 @@ import java.util.List;
 public class StockTradingServiceImpl implements StockTradingService {
 
     private final ParticipationRepository participationRepository;
-
     private final StockSourceService stockSourceService;
+    private final StockRepository stockRepository;
 
     @Override
     public void buyStock(Long participationId, String ticker, int quantity) {
@@ -116,6 +118,8 @@ public class StockTradingServiceImpl implements StockTradingService {
 
         for (StockPositionEntity pos : positions) {
             String ticker = pos.getTicker();
+            StockEntity stockEntity = stockRepository.findByTickerIgnoreCase(ticker)
+                    .orElse(null);
             BigDecimal purchasePrice = pos.getPurchaseAveragePrice();
             int quantity = pos.getQuantity();
 
@@ -131,7 +135,11 @@ public class StockTradingServiceImpl implements StockTradingService {
             // dto.setTodayChange(details.getTodayChange());
             // dto.setTodayChangePct(details.getTodayChangePercent());
 
-            dto.setDescription("some description");
+            if (stockEntity != null) {
+                dto.setDescription(stockEntity.getEmitentName());
+            } else {
+                dto.setDescription("Unknown stock: " + ticker);
+            }
             dto.setCurrentPrice(stockPriceByTicker);
             dto.setTodayChange(BigDecimal.valueOf(1));
             dto.setTodayChangePct(BigDecimal.valueOf(0.1));
