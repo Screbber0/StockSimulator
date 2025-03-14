@@ -24,18 +24,6 @@ public class UserServiceImpl implements UserService {
     private final MailSenderService mailSender;
 
     @Override
-    public void registerUser(String username, String password) throws Exception {
-        if (userRepository.findByUsername(username).isPresent()) {
-            throw new Exception("Username is already taken.");
-        }
-
-        UserEntity newUser = new UserEntity();
-        newUser.setUsername(username);
-        newUser.setPassword(passwordEncoder.encode(password));
-        userRepository.save(newUser);
-    }
-
-    @Override
     public void registerUser(String username, String email, String rawPassword) throws Exception {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new Exception("Username is already taken.");
@@ -67,10 +55,10 @@ public class UserServiceImpl implements UserService {
 
     private void sendVerificationEmail(UserEntity user, String token) {
         String confirmUrl = "http://localhost:8080/confirm?token=" + token;
-        String text = "Hello, " + user.getUsername() +
-                "! \n\nTo confirm your registration in StockSimulator, please click the link below:\n" +
-                confirmUrl + "\n\nThis link will expire in 24 hours.";
-        mailSender.sendAsync(user.getEmail(), "Email Verification", text);
+        String text = "Здравствуйте, " + user.getUsername() +
+                "!\n\nДля подтверждения вашей регистрации в StockSimulator, пожалуйста, перейдите по следующей ссылке:\n" +
+                confirmUrl + "\n\nЭта ссылка будет действительна в течение 24 часов.";
+        mailSender.sendAsync(user.getEmail(), "Подтверждение регистрации", text);
     }
 
     @Override

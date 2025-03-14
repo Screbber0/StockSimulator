@@ -24,7 +24,7 @@ public class ParticipationHistoryScheduler {
 
     // Запускается каждый день в 00:00 - @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 */20 * * * ?")
     public void saveDailyParticipationHistory() {
         System.out.println("=== Saving daily participation history ===");
 

@@ -3,6 +3,7 @@ package ru.screbber.stockSimulator.dto;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Data
 public class StockInfoDto {
@@ -27,6 +28,26 @@ public class StockInfoDto {
     // Минимум за день
     private BigDecimal dayLow;
 
-    // Объём (число акций)
+    // Объём (число лотов)
     private BigDecimal volume;
+
+    public BigDecimal getCurrentPrice() {
+        return currentPrice.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal getDayLow() {
+        return dayLow.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal getDayHigh() {
+        return dayHigh.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal getChange() {
+        return change.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal getChangePercent() {
+        return changePercent.setScale(2, RoundingMode.HALF_UP);
+    }
 }

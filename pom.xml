@@ -71,13 +71,22 @@
             <artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-        <dependency>
-            <groupId>ru.tinkoff.piapi</groupId>
-            <artifactId>java-sdk-core</artifactId>
-            <version>1.27</version>
-        </dependency>
-        <dependency>
+		<dependency>
+			<groupId>ru.tinkoff.piapi</groupId>
+			<artifactId>java-sdk-core</artifactId>
+			<version>1.27</version>
+		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>ru.tinkoff.piapi</groupId>-->
+<!--			<artifactId>java-sdk-strategy</artifactId>-->
+<!--			<version>1.30</version>-->
+<!--		</dependency>-->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.18.1</version>
+		</dependency>
+		<dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.33</version>

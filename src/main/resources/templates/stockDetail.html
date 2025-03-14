@@ -19,54 +19,101 @@
         .tradingview-container {
             margin-top: 30px;
         }
+        .text-green {
+            color: green;
+        }
+        .text-red {
+            color: red;
+        }
+        /* Примерный стиль для canvas */
+        #myCandleChart {
+            max-width: 800px;
+            max-height: 400px;
+        }
     </style>
 </head>
 <body>
 
 <div class="stock-info-container">
     <h1 th:text="${stock.companyName}">Company Name</h1>
-    <p> <strong>Ticker:</strong> <span th:text="${stock.ticker}">SBER</span></p>
+    <p><strong>Ticker:</strong> <span th:text="${stock.ticker}">SBER</span></p>
     <p class="price-info">
         <strong>Current Price:</strong>
-        <span th:text="${stock.currentPrice}">0</span> RUB
+        <span th:text="${stock.currentPrice}"></span>₽
         &nbsp;
         <span th:if="${stock.change != null}">
-            (<span th:text="${stock.change}">0</span>)
-        </span>
+        (<span th:text="${stock.change.signum() > 0 ? '+' : ''} + ${stock.change} + '₽'"
+               th:classappend="${stock.change.signum() >= 0 ? 'text-green' : 'text-red'}">
+        </span>)
+    </span>
         &nbsp;
         <span th:if="${stock.changePercent != null}">
-            <span th:text="${stock.changePercent}"></span>%
+        <span th:text="${stock.changePercent.signum() > 0 ? '+' : ''} + ${stock.changePercent} + '%'"
+              th:classappend="${stock.changePercent.signum() >= 0 ? 'text-green' : 'text-red'}">
         </span>
+    </span>
     </p>
     <p><strong>Day High:</strong> <span th:text="${stock.dayHigh}">0</span></p>
     <p><strong>Day Low:</strong> <span th:text="${stock.dayLow}">0</span></p>
     <p><strong>Volume:</strong> <span th:text="${stock.volume}">0</span></p>
 </div>
 
-<!-- Контейнер для TradingView виджета -->
-<div class="tradingview-container" id="tv_chart_container" style="height:600px; width:800px;"></div>
+<!-- Ссылка на TradingView -->
+<div class="tradingview-container">
+    <a th:href="'https://www.tradingview.com/symbols/MOEX:' + ${stock.ticker}"
+       target="_blank"
+       rel="noopener noreferrer">
+        Открыть график на TradingView
+    </a>
+</div>
 
-<!-- Подключаем скрипт TradingView -->
-<script src="https://s3.tradingview.com/tv.js"></script>
+<!-- Наш canvas для отображения графика, построенного на данных Tinkoff -->
+<canvas id="myCandleChart" width="800" height="400"></canvas>
+
+<!-- Подключаем Chart.js (или Chart.js + Financial plugin) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Если хотите рисовать свечной график, нужен плагин:
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-financial@0.1.0"></script>
+-->
+
 <script th:inline="javascript">
     /*<![CDATA[*/
-    // Подставляем тикер из DTO, например "SBER".
-    // TradingView для Московской биржи требует "MOEX:SBER".
-    let ticker = /*[[${stock.ticker}]]*/ 'AAPL';
 
-    new TradingView.widget({
-        "container_id": "tv_chart_container",
-        "width": 800,
-        "height": 600,
-        "symbol": "MOEX:" + ticker,
-        "interval": "D",
-        "timezone": "Etc/UTC",
-        "theme": "light",
-        "style": "1",
-        "locale": "ru",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_side_toolbar": false
+    // 1) Получаем JSON-данные о свечах, которые вернул контроллер
+    let rawCandles = /*[[${candlesJson}]]*/ '[]';
+    let candleArray = JSON.parse(rawCandles);
+
+    // candleArray = [
+    //   { "time": "2025-03-12T08:00:00Z", "open":100, "high":105, "low":95, "close":102 },
+    //   ...
+    // ]
+    // или "time" - Instant; возможно, "time":"2025-03-12T08:00:00Z"
+
+    console.log("Loaded candle data = ", candleArray);
+
+    // 2) Пример: построим линейный график по CLOSE
+    let labels = candleArray.map(c => c.time.substring(0, 16)); // обрезаем до "2025-03-12T08:00"
+    let closeValues = candleArray.map(c => c.close);
+
+    let ctx = document.getElementById('myCandleChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Close price',
+                data: closeValues,
+                borderColor: 'blue',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: false }
+            }
+        }
     });
     /*]]>*/
 </script>
