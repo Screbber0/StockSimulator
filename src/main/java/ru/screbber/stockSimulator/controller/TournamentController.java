@@ -78,13 +78,15 @@ public class TournamentController {
 
     @GetMapping("/{tournamentId}/ranking")
     public String tournamentRanking(@PathVariable Long tournamentId, Model model) {
-        // Сервис вернёт список всех участников с их балансами и позициями
         List<RankingParticipantDto> rankingList = tournamentService.getTournamentRankingList(tournamentId);
 
-        // Передаём в модель
         model.addAttribute("rankingList", rankingList);
         model.addAttribute("tournamentId", tournamentId);
-        return "tournamentRanking"; // название нового шаблона
+
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        model.addAttribute("currentUsername", currentUsername);
+
+        return "tournamentRanking";
     }
 
     @GetMapping("/search")

@@ -1,99 +1,178 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="'Stock Detail: ' + ${stock.companyName}">Stock Detail</title>
+    <title th:text="'Информация об акции: ' + ${stock.companyName}">Информация об акции</title>
     <style>
         body {
+            /* Общий фон страницы */
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
-            margin: 20px;
         }
+
+        /* Основной контейнер, центрируем и придаём «карточный» вид */
+        .stock-detail-container {
+            background-color: #ffffff;
+            margin: 40px auto; /* отступы сверху/снизу, а также автоцентрирование */
+            padding: 30px;
+            max-width: 900px; /* ограничиваем ширину */
+            border-radius: 10px; /* скруглённые углы */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* лёгкая тень */
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
         .stock-info-container {
             margin-bottom: 20px;
         }
-        .stock-info-container h1 {
-            margin: 0 0 10px 0;
+
+        .stock-info-container p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #444;
         }
+
         .price-info {
             font-size: 1.2em;
+            margin: 10px 0;
         }
-        .tradingview-container {
-            margin-top: 30px;
-        }
+
         .text-green {
             color: green;
         }
+
         .text-red {
             color: red;
         }
-        /* Примерный стиль для canvas */
+
+        /* Блок для TradingView-ссылки */
+        .tradingview-container {
+            margin-top: 20px;
+        }
+
+        /* Контейнер под график */
+        .chart-container {
+            margin-top: 30px;
+        }
+
+        /* Сам canvas */
         #myCandleChart {
-            max-width: 800px;
-            max-height: 400px;
+            max-width: 100%;
+            height: 400px; /* Можно убрать фиксированную высоту, если хотите адаптив */
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
 
-<div class="stock-info-container">
-    <h1 th:text="${stock.companyName}">Company Name</h1>
-    <p><strong>Ticker:</strong> <span th:text="${stock.ticker}">SBER</span></p>
-    <p class="price-info">
-        <strong>Current Price:</strong>
-        <span th:text="${stock.currentPrice}"></span>₽
-        &nbsp;
-        <span th:if="${stock.change != null}">
-        (<span th:text="${stock.change.signum() > 0 ? '+' : ''} + ${stock.change} + '₽'"
-               th:classappend="${stock.change.signum() >= 0 ? 'text-green' : 'text-red'}">
-        </span>)
-    </span>
-        &nbsp;
-        <span th:if="${stock.changePercent != null}">
-        <span th:text="${stock.changePercent.signum() > 0 ? '+' : ''} + ${stock.changePercent} + '%'"
-              th:classappend="${stock.changePercent.signum() >= 0 ? 'text-green' : 'text-red'}">
-        </span>
-    </span>
-    </p>
-    <p><strong>Day High:</strong> <span th:text="${stock.dayHigh}">0</span></p>
-    <p><strong>Day Low:</strong> <span th:text="${stock.dayLow}">0</span></p>
-    <p><strong>Volume:</strong> <span th:text="${stock.volume}">0</span></p>
-</div>
+<div class="stock-detail-container">
+    <div class="stock-info-container">
+        <h1 th:text="${stock.companyName}">Название компании</h1>
 
-<!-- Ссылка на TradingView -->
-<div class="tradingview-container">
-    <a th:href="'https://www.tradingview.com/symbols/MOEX:' + ${stock.ticker}"
-       target="_blank"
-       rel="noopener noreferrer">
-        Открыть график на TradingView
-    </a>
-</div>
+        <p>
+            <strong>Тикер:</strong>
+            <span th:text="${stock.ticker}">SBER</span>
+        </p>
 
-<!-- Наш canvas для отображения графика, построенного на данных Tinkoff -->
-<canvas id="myCandleChart" width="800" height="400"></canvas>
+        <p class="price-info">
+            <strong>Текущая цена:</strong>
+            <span th:text="${stock.currentPrice}"></span> ₽
+            &nbsp;
+            <!-- Изменение за день -->
+            <span th:if="${stock.change != null}">
+                (<span th:text="${stock.change.signum() > 0 ? '+' : ''} + ${stock.change} + '₽' "
+                       th:classappend="${stock.change.signum() >= 0} ? 'text-green' : 'text-red'"></span>)
+            </span>
+            &nbsp;
+            <!-- Процентное изменение -->
+            <span th:if="${stock.changePercent != null}">
+                <span th:text="${stock.changePercent.signum() > 0 ? '+' : ''} + ${stock.changePercent} + '%'"
+                      th:classappend="${stock.changePercent.signum() >= 0} ? 'text-green' : 'text-red'"></span>
+            </span>
+        </p>
+
+        <p>
+            <strong>Максимум за день:</strong>
+            <span th:text="${stock.dayHigh}">0</span> ₽
+        </p>
+        <p>
+            <strong>Минимум за день:</strong>
+            <span th:text="${stock.dayLow}">0</span> ₽
+        </p>
+        <p>
+            <strong>Объём торгов:</strong>
+            <span th:text="${stock.volume}">0</span>
+        </p>
+    </div>
+
+    <!-- Ссылка на TradingView -->
+    <div class="tradingview-container">
+        <a th:href="'https://www.tradingview.com/symbols/MOEX:' + ${stock.ticker}"
+           target="_blank"
+           rel="noopener noreferrer">
+            Открыть график на TradingView
+        </a>
+    </div>
+
+    <!-- Блок, в котором расположен canvas -->
+    <div class="chart-container">
+        <canvas id="myCandleChart"></canvas>
+    </div>
+</div>
 
 <!-- Подключаем Chart.js (или Chart.js + Financial plugin) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Если хотите рисовать свечной график, нужен плагин:
+<!-- Если хотим рисовать свечной график:
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-financial@0.1.0"></script>
 -->
 
 <script th:inline="javascript">
     /*<![CDATA[*/
 
-    // 1) Получаем JSON-данные о свечах, которые вернул контроллер
+    // Получаем JSON со свечами
     let rawCandles = /*[[${candlesJson}]]*/ '[]';
     let candleArray = JSON.parse(rawCandles);
 
-    // candleArray = [
-    //   { "time": "2025-03-12T08:00:00Z", "open":100, "high":105, "low":95, "close":102 },
-    //   ...
-    // ]
-    // или "time" - Instant; возможно, "time":"2025-03-12T08:00:00Z"
+    console.log("Скачанные свечи:", candleArray);
 
-    console.log("Loaded candle data = ", candleArray);
+    // Функция для форматирования даты по-русски: дд.мм.гггг чч:мм
+    function formatDateRussian(isoString) {
+        let dateObj = new Date(isoString);
+        let day = String(dateObj.getDate()).padStart(2, '0');
+        let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        let year = dateObj.getFullYear();
+        let hours = String(dateObj.getHours()).padStart(2, '0');
+        let minutes = String(dateObj.getMinutes()).padStart(2, '0');
 
-    // 2) Пример: построим линейный график по CLOSE
-    let labels = candleArray.map(c => c.time.substring(0, 16)); // обрезаем до "2025-03-12T08:00"
+        return `${day}.${month}.${year} ${hours}:${minutes}`;
+    }
+
+    // Формируем массив подписей (Labels), преобразуя ISO‑дату в нужный формат
+    let labels = candleArray.map(c => formatDateRussian(c.time));
+
+    // Значения для графика (к примеру, цена закрытия)
     let closeValues = candleArray.map(c => c.close);
+
+    // Если хотим красить график в зелёный или красный в зависимости от роста/падения за весь период:
+    let lineColor = 'blue'; // По умолчанию
+    if (closeValues.length > 1) {
+        let firstClose = closeValues[0];
+        let lastClose = closeValues[closeValues.length - 1];
+
+        if (lastClose > firstClose) {
+            lineColor = 'green';
+        } else if (lastClose < firstClose) {
+            lineColor = 'red';
+        }
+        // если равно — можно оставить голубой, или «серый» и т.д.
+    }
 
     let ctx = document.getElementById('myCandleChart').getContext('2d');
     new Chart(ctx, {
@@ -101,9 +180,9 @@
         data: {
             labels: labels,
             datasets: [{
-                label: 'Close price',
+                label: 'Цена акции',
                 data: closeValues,
-                borderColor: 'blue',
+                borderColor: lineColor,
                 borderWidth: 2,
                 fill: false
             }]
@@ -111,7 +190,9 @@
         options: {
             responsive: true,
             scales: {
-                y: { beginAtZero: false }
+                y: {
+                    beginAtZero: false
+                }
             }
         }
     });

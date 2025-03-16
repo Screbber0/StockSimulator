@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Create Tournament</title>
+    <title>Создание турнира</title>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <style>
-
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f7fa;
@@ -72,17 +71,15 @@
 </head>
 <body>
 <div class="form-container">
-    <h1>Create Tournament</h1>
+    <h1>Создание турнира</h1>
     <form th:action="@{/tournament/create}" method="post" th:object="${createTournamentDto}">
-        <label for="name">Tournament Name</label>
-        <input type="text" id="name" name="name" placeholder="Enter tournament name" required>
+        <label for="name">Название турнира</label>
+        <input type="text" id="name" name="name" placeholder="Введите название турнира" required>
 
-        <!-- Поле выбора диапазона дат (start -> end) -->
-        <label for="dateRange">Date Range</label>
+        <label for="dateRange">Диапазон дат</label>
         <input type="text" id="dateRange" name="dateRange" required>
 
-        <!-- Остальные поля формы -->
-        <label for="initialCapital">Initial Virtual Capital</label>
+        <label for="initialCapital">Начальный виртуальный капитал</label>
         <select id="initialCapital" name="initialCapital" required>
             <option value="50000">50 000 ₽</option>
             <option value="100000">100 000 ₽</option>
@@ -92,42 +89,36 @@
             <option value="5000000">5 000 000 ₽</option>
         </select>
 
-        <label for="maxParticipants">Max Participants</label>
-        <input type="number" id="maxParticipants" name="maxParticipants" placeholder="Enter max participants" required>
+        <label for="maxParticipants">Максимальное количество участников</label>
+        <input type="number" id="maxParticipants" name="maxParticipants" placeholder="Введите максимальное количество участников" required>
 
-        <!-- Новое поле: выбор режима (enum) -->
-        <label for="tournamentMode">Tournament Mode</label>
-        <select id="tournamentMode" th:field="*{tournamentMode}" required
-                onchange="toggleRandomStocks(this.value)">
-            <!-- Генерируем <option> из enum -->
+        <label for="tournamentMode">Режим турнира</label>
+        <select id="tournamentMode" th:field="*{tournamentMode}" required onchange="toggleRandomStocks(this.value)">
             <option th:each="mode : ${T(ru.screbber.stockSimulator.constants.TournamentMode).values()}"
                     th:value="${mode}"
-                    th:text="${mode}"></option>
+                    th:text="#{'tournament.mode.' + ${mode}}">
+            </option>
         </select>
 
-        <!-- Блок для выбора числа случайных акций -->
+
         <div id="randomStocksBlock">
-            <label for="randomStocksCount">Random Stocks Count</label>
+            <label for="randomStocksCount">Количество случайных акций в пуле</label>
             <input type="number" id="randomStocksCount" th:field="*{randomStocksCount}" min="0" value="0" />
         </div>
 
-        <!-- Ошибки, если есть -->
         <div th:if="${error}" th:text="${error}" style="color:red;"></div>
 
-        <button type="submit">Create Tournament</button>
+        <button type="submit">Создать турнир</button>
     </form>
 </div>
 
-<!-- Скрипты для jQuery, moment и DateRangePicker -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.2/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1/daterangepicker.min.js"></script>
 
 <script>
-    // Функция для переключения отображения поля randomStocksCount
     function toggleRandomStocks(modeValue) {
         const block = document.getElementById('randomStocksBlock');
-        // Если выбрано LIMITED_RANDOM — показываем, иначе скрываем
         if (modeValue === 'LIMITED_RANDOM') {
             block.style.display = 'block';
         } else {
@@ -136,18 +127,16 @@
     }
 
     $(function() {
-        // Сегодняшняя дата
         let today = moment().startOf('day');
 
-        // Инициализируем плагин
         $('#dateRange').daterangepicker({
-            singleDatePicker: false,      // Если хотите выбрать именно диапазон (начало–конец), оставляем false
-            startDate: today,            // Дата начала по умолчанию = сегодня
-            endDate: today.clone().add(7, 'days'), // Можно заранее задать конец (+7 дней для примера)
-            minDate: today,              // Нельзя выбрать дату раньше сегодня
+            singleDatePicker: false,
+            startDate: today,
+            endDate: today.clone().add(7, 'days'),
+            minDate: today,
             locale: {
-                format: 'YYYY-MM-DD',    // Формат отображения дат
-                separator: ' ➡ ',        // Разделитель между датами
+                format: 'YYYY-MM-DD',
+                separator: ' ➡ ',
             }
         });
 

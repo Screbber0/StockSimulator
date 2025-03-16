@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Register</title>
+    <title>Регистрация</title>
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body>
 <div class="login-container">
-    <h1>Create Account</h1>
+    <h1>Создать аккаунт</h1>
 
     <!-- Сообщение об ошибке -->
     <div th:if="${error}" class="error">
@@ -14,16 +14,16 @@
     </div>
 
     <!-- Форма регистрации -->
-    <form th:action="@{/register}" method="post"  th:object="${registrationDto}">
-        <input type="text" id="username" name="username" placeholder="Username" required>
-        <input type="email" id="email" name="email" placeholder="Email" required>
-        <input type="password" id="password" name="password" placeholder="Password" required>
-        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
-        <button type="submit">Sign Up</button>
+    <form th:action="@{/register}" method="post" th:object="${registrationDto}">
+        <input type="text" id="username" name="username" placeholder="Имя пользователя" required>
+        <input type="email" id="email" name="email" placeholder="Электронная почта" required>
+        <input type="password" id="password" name="password" placeholder="Пароль" required>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Подтвердите пароль" required>
+        <button type="submit">Зарегистрироваться</button>
     </form>
 
     <div class="footer">
-        Already have an account? <a th:href="@{/login}">Log In</a>
+        Уже есть аккаунт? <a th:href="@{/login}">Войти</a>
     </div>
 </div>
 </body>

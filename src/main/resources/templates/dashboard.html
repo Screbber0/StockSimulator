@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Dashboard</title>
-    <!-- Подключаем тему jQuery UI -->
+    <title>Панель управления</title>
     <link rel="stylesheet"
           href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css"/>
     <style>
@@ -69,7 +68,7 @@
             background-color: #0056b3;
         }
 
-        /* Стили для формы Join Tournament */
+        /* Стили для формы Присоединиться к турниру */
         form {
             display: flex;
             gap: 10px;
@@ -106,49 +105,47 @@
 </head>
 <body>
 <div class="dashboard-container">
-    <h1>Dashboard</h1>
+    <h1>Панель управления</h1>
     <div class="welcome-text">
-        <p>Welcome, <span th:text="${#authentication.name}"></span>!</p>
+        <p>Добро пожаловать, <span th:text="${#authentication.name}"></span>!</p>
     </div>
 
     <div class="actions-container">
         <div>
-            <h2>Actions</h2>
+            <h2>Действия</h2>
             <a th:href="@{/tournament/create}">
-                <button type="button">Create Tournament</button>
+                <button type="button">Создать турнир</button>
             </a>
         </div>
 
         <div>
-            <h2>Join Tournament</h2>
+            <h2>Присоединиться к турниру</h2>
             <form th:action="@{/tournament/join}" method="post">
-                <input type="text" name="tournamentName" placeholder="Enter Tournament Name or ID">
-                <button type="submit">Join</button>
+                <input type="text" name="tournamentName" placeholder="Введите название турнира">
+                <button type="submit">Присоединиться</button>
             </form>
         </div>
     </div>
 
     <div>
-        <h2>Your Tournaments</h2>
+        <h2>Ваши турниры</h2>
         <ul class="tournament-list">
             <li th:each="tournament : ${tournaments}">
                 <span th:text="${tournament.name}"></span>
                 <a th:href="@{/tournament/{tournamentId}(tournamentId=${tournament.id})}">
-                    View Tournament
+                    Просмотр турнира
                 </a>
             </li>
         </ul>
     </div>
 </div>
 
-<!-- Подключаем jQuery и jQuery UI для автокомплита -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
         crossorigin="anonymous"></script>
 
 <script>
-    // Скрипт автокомплита при вводе названия/ID турнира
     $(function() {
         $('input[name="tournamentName"]').autocomplete({
             source: function(request, response) {
@@ -160,7 +157,7 @@
                     }
                 });
             },
-            minLength: 1 // Минимальное кол-во символов, после которого включается автокомплит
+            minLength: 1
         });
     });
 </script>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Tournament Ranking</title>
+    <title>Рейтинг</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,23 +30,6 @@
             margin-bottom: 20px;
         }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        table th,
-        table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-        thead {
-            background-color: #f0f2f5;
-        }
-        th {
-            color: #555;
-        }
-
         .back-link {
             display: inline-block;
             margin-bottom: 15px;
@@ -56,25 +39,54 @@
         .back-link:hover {
             text-decoration: underline;
         }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        thead {
+            background-color: #f0f2f5;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            color: #555;
+        }
+
+        /* Класс для выделения текущего пользователя */
+        .highlight-row {
+            background-color: #f0eef3; /* Вы можете подобрать любой другой цвет */
+        }
     </style>
 </head>
 <body>
 <div class="ranking-container">
-    <h1>Ranking</h1>
+    <h1>Рейтинг</h1>
 
-    <!-- Кнопка/ссылка вернуться -->
-    <a th:href="@{/tournament/{tournamentId}(tournamentId=${tournamentId})}" class="back-link">Back to Tournament</a>
+    <!-- Ссылка «Вернуться к турниру» -->
+    <a th:href="@{/tournament/{tournamentId}(tournamentId=${tournamentId})}" class="back-link">
+        Вернуться к турниру
+    </a>
 
     <table>
         <thead>
         <tr>
-            <th>Position</th>
-            <th>Username</th>
-            <th>Total Balance</th>
+            <th>Место</th>
+            <th>Пользователь</th>
+            <th>Общий баланс</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="participant : ${rankingList}">
+        <!--
+            Благодаря сравнению (participant.username == currentUsername)
+            строке будет добавлен класс highlight-row,
+            если пользователь является текущим
+        -->
+        <tr th:each="participant : ${rankingList}"
+            th:classappend="${participant.username} == ${currentUsername} ? 'highlight-row' : '' ">
             <td th:text="${participant.rankPosition}">1</td>
             <td th:text="${participant.username}">username</td>
             <td th:text="'₽ ' + ${participant.totalBalance}">0</td>

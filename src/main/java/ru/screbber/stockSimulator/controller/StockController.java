@@ -35,7 +35,7 @@ public class StockController {
 
         // 1. Подставляем дефолтные даты, если не переданы
         Instant fromDate = (from == null)
-                ? Instant.now().minus(3, ChronoUnit.DAYS) // за 3 дней
+                ? Instant.now().minus(4, ChronoUnit.DAYS)
                 : Instant.parse(from);
         Instant toDate = (to == null)
                 ? Instant.now()
