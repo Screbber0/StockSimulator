@@ -80,4 +80,9 @@ public class UserServiceImpl implements UserService {
         tokenRepository.delete(vte);
         return true;
     }
+
+    @Override
+    public UserEntity findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow();
+    }
 }

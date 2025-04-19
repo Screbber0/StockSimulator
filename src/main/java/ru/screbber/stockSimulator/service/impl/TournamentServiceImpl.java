@@ -226,8 +226,6 @@ public class TournamentServiceImpl implements TournamentService {
                 .collect(Collectors.toList());
     }
 
-
-
     @Override
     public List<String> findTickersByPrefix(String tournamentPrefix) {
         return tournamentRepository.findByNameStartsWith(tournamentPrefix).stream()

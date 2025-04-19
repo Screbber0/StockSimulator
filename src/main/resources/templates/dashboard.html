@@ -105,6 +105,9 @@
 </head>
 <body>
 <div class="dashboard-container">
+    <a th:href="@{/user/profile}">
+        <img th:src="@{/images/user.png}" alt="Профиль" style="width: 40px; height: 40px; border-radius: 50%; float: right; cursor: pointer;">
+    </a>
     <h1>Панель управления</h1>
     <div class="welcome-text">
         <p>Добро пожаловать, <span th:text="${#authentication.name}"></span>!</p>

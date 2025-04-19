@@ -1,8 +1,10 @@
 package ru.screbber.stockSimulator.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,16 +25,19 @@ public class LoginController {
 
     @GetMapping("/register")
     public String registerForm(Model model) {
-        // Передадим пустую DTO, чтобы Thymeleaf мог привязывать поля
         model.addAttribute("registrationDto", new RegistrationDto());
         return "register";
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute RegistrationDto registrationDto, Model model) {
+    public String registerUser(@Valid @ModelAttribute RegistrationDto registrationDto, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errors", bindingResult.getAllErrors());
+            return "register";
+        }
         try {
             if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
-                model.addAttribute("error", "Passwords do not match.");
+                model.addAttribute("error", "Пароли не совпадают.");
                 return "register";
             }
             userService.registerUser(
@@ -51,10 +56,10 @@ public class LoginController {
     public String confirmEmail(@RequestParam("token") String token, Model model) {
         boolean success = userService.confirmEmail(token);
         if (success) {
-            model.addAttribute("message", "Your email has been verified successfully. You can now log in.");
+            model.addAttribute("message", "Ваш email успешно подтвержден. Теперь вы можете войти.");
             return "login";
         } else {
-            model.addAttribute("error", "Invalid or expired token.");
+            model.addAttribute("error", "Неверный или просроченный токен.");
             return "error";
         }
     }

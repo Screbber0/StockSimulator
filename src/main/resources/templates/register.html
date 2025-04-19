@@ -13,12 +13,23 @@
         <span th:text="${error}"></span>
     </div>
 
+    <!-- Ошибки валидации -->
+    <ul th:if="${errors}" class="error-list">
+        <li th:each="err : ${errors}" th:text="${err.defaultMessage}"></li>
+    </ul>
+
     <!-- Форма регистрации -->
     <form th:action="@{/register}" method="post" th:object="${registrationDto}">
-        <input type="text" id="username" name="username" placeholder="Имя пользователя" required>
-        <input type="email" id="email" name="email" placeholder="Электронная почта" required>
+        <input type="text" id="username" name="username" placeholder="Имя пользователя" th:value="*{username}" required>
+        <input type="email" id="email" name="email" placeholder="Электронная почта" th:value="*{email}" required>
+        <span class="validation-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+
         <input type="password" id="password" name="password" placeholder="Пароль" required>
+        <span class="validation-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+
         <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Подтвердите пароль" required>
+        <span class="validation-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
+
         <button type="submit">Зарегистрироваться</button>
     </form>
 

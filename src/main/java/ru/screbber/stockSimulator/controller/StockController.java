@@ -2,6 +2,7 @@ package ru.screbber.stockSimulator.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+@Tag(name = "stocks_methods")
 @Controller
 @RequestMapping("/api/stocks")
 @RequiredArgsConstructor
@@ -35,7 +37,7 @@ public class StockController {
 
         // 1. Подставляем дефолтные даты, если не переданы
         Instant fromDate = (from == null)
-                ? Instant.now().minus(4, ChronoUnit.DAYS)
+                ? Instant.now().minus(7, ChronoUnit.DAYS)
                 : Instant.parse(from);
         Instant toDate = (to == null)
                 ? Instant.now()

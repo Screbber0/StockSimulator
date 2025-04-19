@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Личный кабинет</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .profile-container {
+            background-color: #ffffff;
+            margin: 40px auto;
+            padding: 30px;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 14px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            margin-bottom: 10px;
+        }
+        .success-message {
+            color: green;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="profile-container">
+    <h1>Личный кабинет</h1>
+
+    <!-- Сообщения об ошибках/успехе -->
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
+    <div th:if="${success}" class="success-message" th:text="${success}"></div>
+
+    <!-- Форма изменения имени, email и пароля -->
+    <form th:action="@{/user/profile}" method="post">
+        <label for="username">Имя пользователя:</label>
+        <input type="text" id="username" name="username" th:value="${user.username}">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" th:value="${user.email}">
+
+        <label for="currentPassword">Текущий пароль (для подтверждения):</label>
+        <input type="password" id="currentPassword" name="currentPassword" required>
+
+        <label for="newPassword">Новый пароль (необязательно):</label>
+        <input type="password" id="newPassword" name="newPassword">
+
+        <label for="confirmPassword">Подтвердите новый пароль:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword">
+
+        <button type="submit">Сохранить изменения</button>
+
+        <a th:href="@{/dashboard}">
+            <button type="button" style="margin-top: 20px;">Назад</button>
+        </a>
+    </form>
+</div>
+</body>
+</html>
