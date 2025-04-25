@@ -100,10 +100,14 @@
             </option>
         </select>
 
-
         <div id="randomStocksBlock">
             <label for="randomStocksCount">Количество случайных акций в пуле</label>
             <input type="number" id="randomStocksCount" th:field="*{randomStocksCount}" min="0" value="0" />
+        </div>
+
+        <div id="teamSettings">
+            <label for="maxTeams">Максимальное количество команд</label>
+            <input type="number" id="maxTeams" th:field="*{maxTeams}" min="1"/>
         </div>
 
         <div th:if="${error}" th:text="${error}" style="color:red;"></div>
@@ -119,11 +123,10 @@
 <script>
     function toggleRandomStocks(modeValue) {
         const block = document.getElementById('randomStocksBlock');
-        if (modeValue === 'LIMITED_RANDOM') {
-            block.style.display = 'block';
-        } else {
-            block.style.display = 'none';
-        }
+        block.style.display = (modeValue === 'LIMITED_RANDOM') ? 'block' : 'none';
+
+        const teamBlock = document.getElementById('teamSettings');
+        teamBlock.style.display = (modeValue === 'TEAM') ? 'block' : 'none';
     }
 
     $(function() {

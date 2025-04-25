@@ -29,17 +29,15 @@
             color: #333;
             margin-bottom: 20px;
         }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 15px;
-            color: #007bff;
-            text-decoration: none;
+        a.back{
+            display:inline-block;
+            margin-bottom:15px;
+            color:#007bff;
+            text-decoration:none
         }
-        .back-link:hover {
-            text-decoration: underline;
+        a.back:hover{
+            text-decoration:underline
         }
-
         table {
             border-collapse: collapse;
             width: 100%;
@@ -67,9 +65,8 @@
     <h1>Рейтинг</h1>
 
     <!-- Ссылка «Вернуться к турниру» -->
-    <a th:href="@{/tournament/{tournamentId}(tournamentId=${tournamentId})}" class="back-link">
-        Вернуться к турниру
-    </a>
+    <a class="back"
+       th:href="@{/tournament/{t}(t=${tournamentId})}">← Вернуться к турниру</a>
 
     <table>
         <thead>

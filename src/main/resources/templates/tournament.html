@@ -170,17 +170,103 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+        .teams-wrapper{                       /* общий контейнер блока "Команды" */
+            display:flex;
+            gap:30px;
+            flex-wrap:wrap;
+            margin-bottom:25px;
+        }
+        .team-card{                           /* мини‑карточка создания / вступления */
+            flex:1 1 260px;
+            background:#f7f9fc;
+            border:1px solid #e0e4eb;
+            border-radius:8px;
+            padding:20px;
+            box-shadow:0 2px 4px rgba(0,0,0,.05);
+        }
+        .team-card h3{
+            margin:0 0 15px 0;
+            font-size:17px;
+            color:#444;
+        }
+        .team-card form{
+            display:flex;
+            gap:10px;
+            flex-direction:column;
+        }
+        .team-card input,
+        .team-card select{
+            padding:10px;
+            border:1px solid #d0d7e2;
+            border-radius:5px;
+            font-size:14px;
+        }
+        .team-card button{
+            padding:10px;
+            background:#007bff;
+            color:#fff;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+            transition:.2s;
+        }
+        .team-card button:hover{background:#0056b3;}
     </style>
 </head>
 <body>
 <div class="tournament-container">
     <h1>Турнир</h1>
+    <div th:if="${tournamentMode == 'TEAM'}">
+        <!-- если пользователь ещё без команды -->
+        <div th:if="${userTeam == null}" class="teams-wrapper">
+
+            <!-- карточка "Создать" -->
+            <div class="team-card">
+                <h3>Создать команду</h3>
+                <form th:action="@{/team/create}" method="post">
+                    <input type="hidden" name="tournamentId" th:value="${tournamentId}">
+                    <input type="text" name="name" placeholder="Название команды" required>
+                    <button type="submit">Создать</button>
+                </form>
+            </div>
+
+            <!-- карточка "Вступить" -->
+            <div class="team-card">
+                <h3>Вступить в команду</h3>
+                <form th:action="@{/team/join}" method="post">
+                    <input type="hidden" name="tournamentId" th:value="${tournamentId}">
+                    <select name="teamId" required>
+                        <option value="" disabled selected>Выберите команду</option>
+                        <option th:each="t : ${teams}" th:value="${t.id}"
+                                th:text="${t.name} + ' (' + ${#lists.size(t.participants)} + ')'">
+                        </option>
+                    </select>
+                    <button type="submit">Вступить</button>
+                </form>
+            </div>
+        </div>
+        <!-- если уже в команде -->
+        <div th:unless="${userTeam == null}" class="teams-wrapper">
+            <div class="team-card" style="flex:1 1 100%;">
+                <h3>Ваша команда</h3>
+                <p style="font-size:16px;margin:0">
+                    <strong th:text="${userTeam.name}">Team Name</strong>
+                    (участников: <span th:text="${#lists.size(userTeam.participants)}">0</span>)
+                </p>
+            </div>
+        </div>
+    </div>
     <div class="info-panel">
         <p>Общий баланс: <strong><span th:text="${totalBalance}">0</span></strong></p>
         <p>Текущие наличные: <strong><span th:text="${cash}">0</span></strong></p>
         <p>Ваше место в турнире: <strong><span th:text="${rank}">N/A</span></strong></p>
         <a th:href="@{/tournament/{tournamentId}/ranking(tournamentId=${tournamentId})}">
             Смотреть всех участников
+        </a>
+        <br/>
+        <a th:if="${tournamentMode == 'TEAM'}"
+           th:href="@{/tournament/{tournamentId}/teamRanking(tournamentId=${tournamentId})}">
+            Смотреть рейтинг команд
         </a>
     </div>
 

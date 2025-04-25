@@ -19,11 +19,13 @@ public class CreateTournamentDto {
 
     private TournamentMode tournamentMode;
 
-    private Integer randomStocksCount;
-
     private LocalDate startDate;
 
     private LocalDate endDate;
+
+    private Integer maxTeams;
+
+    private Integer randomStocksCount;
 
     public void setDateRange(String dateRange) {
         this.dateRange = dateRange;

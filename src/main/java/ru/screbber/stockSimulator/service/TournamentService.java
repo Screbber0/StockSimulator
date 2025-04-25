@@ -1,6 +1,8 @@
 package ru.screbber.stockSimulator.service;
 
 import ru.screbber.stockSimulator.dto.*;
+import ru.screbber.stockSimulator.entity.ParticipationEntity;
+import ru.screbber.stockSimulator.entity.TournamentEntity;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,10 +27,16 @@ public interface TournamentService {
 
     List<RankingParticipantDto> getTournamentRankingList(Long tournamentId);
 
+    List<RankingTeamDto> getTeamRankingList(Long teamId);
+
     List<ParticipationHistoryPointDto> getParticipationHistory(Long participationId);
 
     /**
      * Найти турнир по префиксу
      */
     List<String> findTickersByPrefix(String tournamentPrefix);
+
+    ParticipationEntity getParticipationById(Long participationId);
+
+    TournamentEntity getTournamentById(Long tournamentId);
 }

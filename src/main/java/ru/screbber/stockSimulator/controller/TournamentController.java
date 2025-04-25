@@ -6,11 +6,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.screbber.stockSimulator.dto.CreateTournamentDto;
-import ru.screbber.stockSimulator.dto.ParticipantStockPositionDto;
-import ru.screbber.stockSimulator.dto.ParticipationHistoryPointDto;
-import ru.screbber.stockSimulator.dto.RankingParticipantDto;
+import ru.screbber.stockSimulator.constants.TournamentMode;
+import ru.screbber.stockSimulator.dto.*;
+import ru.screbber.stockSimulator.entity.ParticipationEntity;
+import ru.screbber.stockSimulator.entity.TeamEntity;
+import ru.screbber.stockSimulator.entity.TournamentEntity;
 import ru.screbber.stockSimulator.service.StockTradingService;
+import ru.screbber.stockSimulator.service.TeamService;
 import ru.screbber.stockSimulator.service.TournamentService;
 
 import java.math.BigDecimal;
@@ -23,6 +25,7 @@ public class TournamentController {
 
     private final TournamentService tournamentService;
     private final StockTradingService stockTradingService;
+    private final TeamService teamService;
 
     @GetMapping("/create")
     public String showCreateTournamentPage(Model model) {
@@ -68,10 +71,22 @@ public class TournamentController {
         model.addAttribute("totalBalance", totalBalance);
         model.addAttribute("rank", rank);
 
+        // Получаем исторические данные стоимости портфеля для построения графика
         List<ParticipationHistoryPointDto> historyData = tournamentService.getParticipationHistory(participationId);
         ObjectMapper mapper = new ObjectMapper();
         String historyDataJson = mapper.writeValueAsString(historyData);
         model.addAttribute("historyDataJson", historyDataJson);
+
+        // Проставляем игровой режим и данные для него
+        ParticipationEntity participation = tournamentService.getParticipationById(participationId);
+        TournamentEntity t = tournamentService.getTournamentById(tournamentId);
+        model.addAttribute("tournamentMode", t.getMode().name());
+        TeamEntity userTeam = participation.getTeam();
+        model.addAttribute("userTeam", userTeam);
+        if (t.getMode() == TournamentMode.TEAM) {
+            model.addAttribute("teams", teamService.getTeamsInTournament(tournamentId));
+            model.addAttribute("teamRanking", tournamentService.getTeamRankingList(tournamentId));
+        }
 
         return "tournament";
     }
@@ -87,6 +102,23 @@ public class TournamentController {
         model.addAttribute("currentUsername", currentUsername);
 
         return "tournamentRanking";
+    }
+
+    @GetMapping("/{tournamentId}/teamRanking")
+    public String teamRanking(@PathVariable Long tournamentId, Model model) {
+
+        List<RankingTeamDto> ranking = tournamentService.getTeamRankingList(tournamentId);
+        model.addAttribute("teamRanking", ranking);
+        model.addAttribute("tournamentId", tournamentId);
+
+        // команда пользователя – чтобы подсветить строку
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long partId = tournamentService.getParticipationIdByUsernameAndTournamentId(username, tournamentId);
+        ParticipationEntity part = tournamentService.getParticipationById(partId);
+        TeamEntity myTeam = part.getTeam();
+        model.addAttribute("myTeamName",  myTeam != null ? myTeam.getName() : "");
+
+        return "teamRanking";
     }
 
     @GetMapping("/search")

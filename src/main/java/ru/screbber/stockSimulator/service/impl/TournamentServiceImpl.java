@@ -3,15 +3,10 @@ package ru.screbber.stockSimulator.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.screbber.stockSimulator.dto.*;
-import ru.screbber.stockSimulator.entity.ParticipationEntity;
-import ru.screbber.stockSimulator.entity.ParticipationHistoryEntity;
-import ru.screbber.stockSimulator.entity.TournamentEntity;
-import ru.screbber.stockSimulator.entity.UserEntity;
+import ru.screbber.stockSimulator.entity.*;
 import ru.screbber.stockSimulator.entity.stock.StockPositionEntity;
-import ru.screbber.stockSimulator.repository.ParticipationHistoryRepository;
-import ru.screbber.stockSimulator.repository.ParticipationRepository;
-import ru.screbber.stockSimulator.repository.TournamentRepository;
-import ru.screbber.stockSimulator.repository.UserRepository;
+import ru.screbber.stockSimulator.exception.ParticipationNotFound;
+import ru.screbber.stockSimulator.repository.*;
 import ru.screbber.stockSimulator.service.StockSourceService;
 import ru.screbber.stockSimulator.service.TournamentService;
 
@@ -34,6 +29,8 @@ public class TournamentServiceImpl implements TournamentService {
 
     private final StockSourceService stockSourceService;
 
+    private final TeamRepository teamRepository;
+
     @Override
     public void createTournamentAndJoin(CreateTournamentDto dto, String username) {
         TournamentEntity tournament = new TournamentEntity();
@@ -44,6 +41,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setMaxParticipants(dto.getMaxParticipants());
         tournament.setMode(dto.getTournamentMode());
         tournament.setRandomStocksCount(dto.getRandomStocksCount());
+        tournament.setMaxTeams(dto.getMaxTeams());
         tournamentRepository.save(tournament);
 
         UserEntity user = userRepository.findByUsername(username)
@@ -214,6 +212,42 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
+    public List<RankingTeamDto> getTeamRankingList(Long tournamentId){
+        List<TeamEntity> teams = teamRepository.findByTournament_Id(tournamentId);
+
+        // считаем баланс каждой команды
+        List<RankingTeamDto> list = teams.stream().map(team -> {
+                    BigDecimal bal = calculateTeamBalance(team);
+                    return new RankingTeamDto(0L, team.getName(), bal);
+                }).sorted((a,b)->b.getBalance().compareTo(a.getBalance()))
+                .toList();
+
+        long pos = 1;
+        for (RankingTeamDto dto : list){
+            dto = new RankingTeamDto(pos++, dto.getTeamName(), dto.getBalance());
+        }
+        return list;
+    }
+
+    /**
+     * Считает суммарный баланс всех участников команды.
+     */
+    private BigDecimal calculateTeamBalance(TeamEntity team) {
+        BigDecimal totalBalance = BigDecimal.ZERO;
+        for (ParticipationEntity p : team.getParticipants()) {
+            BigDecimal pBalance = getUserTotalBalanceByParticipationId(p.getId());
+            totalBalance = totalBalance.add(pBalance);
+        }
+        return totalBalance;
+    }
+
+    @Override
+    public TournamentEntity getTournamentById(Long tournamentId) {
+        return tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new RuntimeException("Tournament not found"));
+    }
+
+    @Override
     public List<ParticipationHistoryPointDto> getParticipationHistory(Long participationId) {
         List<ParticipationHistoryEntity> records = participantHistoryRepository
                 .findByParticipationIdOrderBySnapshotDateAsc(participationId);
@@ -232,5 +266,11 @@ public class TournamentServiceImpl implements TournamentService {
                 .map(TournamentEntity::getName)
                 .limit(5)
                 .toList();
+    }
+
+    @Override
+    public ParticipationEntity getParticipationById(Long participationId) {
+        return participationRepository.findById(participationId)
+                .orElseThrow(() -> new ParticipationNotFound("Participation not found"));
     }
 }
