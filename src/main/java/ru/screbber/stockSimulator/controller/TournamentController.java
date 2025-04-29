@@ -64,7 +64,9 @@ public class TournamentController {
         List<ParticipantStockPositionDto> userStockPositions = stockTradingService.getUserStockPositions(participationId);
         BigDecimal totalBalance = tournamentService.getUserTotalBalanceByParticipationIdAndUserStockPositionList(participationId, userStockPositions);
         Long rank = tournamentService.getRankingByParticipation(participationId);
+        TournamentEntity tournament = tournamentService.getTournamentById(tournamentId);
 
+        model.addAttribute("tournamentName", tournament.getName());
         model.addAttribute("tournamentId", tournamentId);
         model.addAttribute("cash", cash);
         model.addAttribute("stocks", userStockPositions);
@@ -79,11 +81,10 @@ public class TournamentController {
 
         // Проставляем игровой режим и данные для него
         ParticipationEntity participation = tournamentService.getParticipationById(participationId);
-        TournamentEntity t = tournamentService.getTournamentById(tournamentId);
-        model.addAttribute("tournamentMode", t.getMode().name());
+        model.addAttribute("tournamentMode", tournament.getMode().name());
         TeamEntity userTeam = participation.getTeam();
         model.addAttribute("userTeam", userTeam);
-        if (t.getMode() == TournamentMode.TEAM) {
+        if (tournament.getMode() == TournamentMode.TEAM) {
             model.addAttribute("teams", teamService.getTeamsInTournament(tournamentId));
             model.addAttribute("teamRanking", tournamentService.getTeamRankingList(tournamentId));
         }
@@ -101,7 +102,7 @@ public class TournamentController {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         model.addAttribute("currentUsername", currentUsername);
 
-        return "tournamentRanking";
+        return "participantRanking";
     }
 
     @GetMapping("/{tournamentId}/teamRanking")
@@ -123,7 +124,7 @@ public class TournamentController {
 
     @GetMapping("/search")
     @ResponseBody
-    public List<String> searchTournamentByPrefix(@RequestParam String term) {
+    public List<TournamentSuggestDto> searchTournamentByPrefix(@RequestParam String term) {
         return tournamentService.findTickersByPrefix(term);
     }
 }

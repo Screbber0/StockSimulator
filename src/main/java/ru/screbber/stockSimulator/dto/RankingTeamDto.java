@@ -10,7 +10,7 @@ import java.math.RoundingMode;
 @AllArgsConstructor
 public class RankingTeamDto {
 
-    private Long rank;
+    private Long rankPosition;
 
     private String teamName;
 

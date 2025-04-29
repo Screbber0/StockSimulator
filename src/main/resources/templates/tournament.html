@@ -121,14 +121,12 @@
         th {
             color: #555;
         }
-
         .text-green {
             color: green;
         }
         .text-red {
             color: red;
         }
-
         .arrow-up,
         .arrow-down {
             font-size: 12px;
@@ -141,22 +139,18 @@
         .arrow-down {
             color: red;
         }
-
         .stocks-block h2 {
             margin-top: 0;
             font-size: 18px;
             color: #555;
             margin-bottom: 15px;
         }
-
         .info-panel {
             margin-bottom: 20px;
         }
-
         .info-panel p {
             margin: 5px 0;
         }
-
         .chart-block {
             margin-top: 40px;
         }
@@ -210,12 +204,25 @@
             cursor:pointer;
             transition:.2s;
         }
-        .team-card button:hover{background:#0056b3;}
+        .team-card button:hover{
+            background:#0056b3;
+        }
+        a.back{
+            display:inline-block;
+            margin-bottom:15px;
+            color:#007bff;
+            text-decoration:none
+        }
+        a.back:hover{
+            text-decoration:underline
+        }
     </style>
 </head>
 <body>
 <div class="tournament-container">
-    <h1>Турнир</h1>
+    <h1 th:text="${tournamentName} + ' (' + #{'tournament.mode.' + ${tournamentMode}} + ')'">Название турнира (Режим)</h1>
+<!--    <a class="back"-->
+<!--       th:href="@{/dashboard}">← Вернуться к турнирам</a>-->
     <div th:if="${tournamentMode == 'TEAM'}">
         <!-- если пользователь ещё без команды -->
         <div th:if="${userTeam == null}" class="teams-wrapper">
@@ -250,8 +257,8 @@
             <div class="team-card" style="flex:1 1 100%;">
                 <h3>Ваша команда</h3>
                 <p style="font-size:16px;margin:0">
-                    <strong th:text="${userTeam.name}">Team Name</strong>
-                    (участников: <span th:text="${#lists.size(userTeam.participants)}">0</span>)
+                    <strong th:text="${userTeam.name}">TeamName</strong>
+                    (участников:<span th:text="${#lists.size(userTeam.participants)}">0</span>)
                 </p>
             </div>
         </div>
@@ -261,7 +268,7 @@
         <p>Текущие наличные: <strong><span th:text="${cash}">0</span></strong></p>
         <p>Ваше место в турнире: <strong><span th:text="${rank}">N/A</span></strong></p>
         <a th:href="@{/tournament/{tournamentId}/ranking(tournamentId=${tournamentId})}">
-            Смотреть всех участников
+            Смотреть рейтинг участников
         </a>
         <br/>
         <a th:if="${tournamentMode == 'TEAM'}"

@@ -156,7 +156,13 @@
                     url: '/tournament/search',
                     data: { term: request.term },
                     success: function(data) {
-                        response(data);
+                        let transformed = data.map(item => {
+                            return {
+                                label: item.name + " (" + item.mode + ")",
+                                value: item.name
+                            };
+                        });
+                        response(transformed);
                     }
                 });
             },

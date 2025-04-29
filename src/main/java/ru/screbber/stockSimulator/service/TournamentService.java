@@ -34,7 +34,7 @@ public interface TournamentService {
     /**
      * Найти турнир по префиксу
      */
-    List<String> findTickersByPrefix(String tournamentPrefix);
+    List<TournamentSuggestDto> findTickersByPrefix(String tournamentPrefix);
 
     ParticipationEntity getParticipationById(Long participationId);
 

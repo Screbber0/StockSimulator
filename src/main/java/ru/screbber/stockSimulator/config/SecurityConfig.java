@@ -20,7 +20,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        // TODO: настроить цепочку фильтров
         return http.csrf(AbstractHttpConfigurer::disable)
                 //.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/register", "/api/stocks/**", "/tournament/search", "/confirm" ,"/css/**", "/js/**").permitAll()
@@ -39,7 +38,6 @@ public class SecurityConfig {
                 .build();
     }
 
-    // TODO: разобраться нужен ли провайдер
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();

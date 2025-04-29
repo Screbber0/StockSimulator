@@ -67,10 +67,21 @@
         button:hover {
             background-color: #0056b3;
         }
+        a.back{
+            display:inline-block;
+            color:#007bff;
+            text-decoration:none;
+            font-size: 14px;
+        }
+        a.back:hover{
+            text-decoration:underline
+        }
     </style>
 </head>
 <body>
 <div class="form-container">
+    <a class="back"
+       th:href="@{/dashboard}">← Вернуться к турнирам</a>
     <h1>Создание турнира</h1>
     <form th:action="@{/tournament/create}" method="post" th:object="${createTournamentDto}">
         <label for="name">Название турнира</label>

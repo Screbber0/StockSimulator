@@ -1,40 +1,93 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Рейтинг команд</title>
-  <style>
-    body{font-family:Arial, sans-serif;background:#f5f7fa;margin:0;
-      display:flex;justify-content:center;align-items:flex-start;min-height:100vh;}
-    .box{background:#fff;margin-top:40px;padding:30px;border-radius:8px;
-      box-shadow:0 4px 8px rgba(0,0,0,.1);max-width:600px;width:100%;}
-    h1{font-size:24px;margin:0 0 20px;color:#333}
-    a.back{display:inline-block;margin-bottom:15px;color:#007bff;text-decoration:none}
-    a.back:hover{text-decoration:underline}
+    <title>Рейтинг команд</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
 
-    table{width:100%;border-collapse:collapse}
-    thead{background:#f0f2f5}
-    th,td{border:1px solid #ccc;padding:8px;text-align:center;font-size:14px}
-    .me{background:#f0eef3}
-  </style>
+        .box {
+            background: #fff;
+            margin-top: 40px;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, .1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0 0 20px;
+            color: #333
+        }
+
+        a.back {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #007bff;
+            text-decoration: none
+        }
+
+        a.back:hover {
+            text-decoration: underline
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        thead {
+            background: #f0f2f5
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            font-size: 14px
+        }
+        /* Класс для выделения текущего пользователя */
+        .highlight-row {
+            background-color: #f0eef3;
+        }
+        .me {
+            background: #f0eef3
+        }
+    </style>
 </head>
 <body>
 <div class="box">
-  <h1>Рейтинг команд</h1>
+    <h1>Рейтинг команд</h1>
 
-  <a class="back"
-     th:href="@{/tournament/{t}(t=${tournamentId})}">← Вернуться к турниру</a>
+    <a class="back"
+       th:href="@{/tournament/{t}(t=${tournamentId})}">← Вернуться к турниру</a>
 
-  <table>
-    <thead><tr><th>Место</th><th>Команда</th><th>Баланс</th></tr></thead>
-    <tbody>
-    <tr th:each="tr : ${teamRanking}"
-        th:classappend="${tr.teamName} == ${myTeamName} ? 'me' : ''">
-      <td th:text="${tr.rank}">1</td>
-      <td th:text="${tr.teamName}">Team</td>
-      <td th:text="'₽ ' + ${tr.balance}">0</td>
-    </tr>
-    </tbody>
-  </table>
+    <table>
+        <thead>
+        <tr>
+            <th>Место</th>
+            <th>Команда</th>
+            <th>Средний баланс</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="team : ${teamRanking}"
+            th:classappend="${team.teamName} == ${myTeamName} ? 'highlight-row' : '' ">
+            <td th:text="${team.rankPosition}">1</td>
+            <td th:text="${team.teamName}">Team name</td>
+            <td th:text="'₽ ' + ${#numbers.formatDecimal(team.balance, 0, 2)}">₽ 0.00</td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

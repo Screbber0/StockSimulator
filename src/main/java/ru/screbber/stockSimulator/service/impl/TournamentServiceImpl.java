@@ -1,7 +1,9 @@
 package ru.screbber.stockSimulator.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import ru.screbber.stockSimulator.constants.TournamentMode;
 import ru.screbber.stockSimulator.dto.*;
 import ru.screbber.stockSimulator.entity.*;
 import ru.screbber.stockSimulator.entity.stock.StockPositionEntity;
@@ -11,8 +13,10 @@ import ru.screbber.stockSimulator.service.StockSourceService;
 import ru.screbber.stockSimulator.service.TournamentService;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +34,8 @@ public class TournamentServiceImpl implements TournamentService {
     private final StockSourceService stockSourceService;
 
     private final TeamRepository teamRepository;
+
+    private final  MessageSource messageSource;
 
     @Override
     public void createTournamentAndJoin(CreateTournamentDto dto, String username) {
@@ -212,33 +218,38 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<RankingTeamDto> getTeamRankingList(Long tournamentId){
+    public List<RankingTeamDto> getTeamRankingList(Long tournamentId) {
         List<TeamEntity> teams = teamRepository.findByTournament_Id(tournamentId);
 
-        // считаем баланс каждой команды
-        List<RankingTeamDto> list = teams.stream().map(team -> {
+        List<RankingTeamDto> list = teams.stream()
+                .map(team -> {
                     BigDecimal bal = calculateTeamBalance(team);
-                    return new RankingTeamDto(0L, team.getName(), bal);
-                }).sorted((a,b)->b.getBalance().compareTo(a.getBalance()))
-                .toList();
+                    return new RankingTeamDto(null, team.getName(), bal);
+                })
+                .sorted((a, b) -> b.getBalance().compareTo(a.getBalance()))
+                .collect(Collectors.toList());
 
         long pos = 1;
-        for (RankingTeamDto dto : list){
-            dto = new RankingTeamDto(pos++, dto.getTeamName(), dto.getBalance());
+        for (RankingTeamDto dto : list) {
+            dto.setRankPosition(pos++);
         }
         return list;
     }
 
     /**
-     * Считает суммарный баланс всех участников команды.
+     * Считает средний баланс всех участников команды.
      */
     private BigDecimal calculateTeamBalance(TeamEntity team) {
+        if (team.getParticipants().isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
         BigDecimal totalBalance = BigDecimal.ZERO;
         for (ParticipationEntity p : team.getParticipants()) {
             BigDecimal pBalance = getUserTotalBalanceByParticipationId(p.getId());
             totalBalance = totalBalance.add(pBalance);
         }
-        return totalBalance;
+        return totalBalance.divide(BigDecimal.valueOf(team.getParticipants().size()), 2, RoundingMode.HALF_UP);
     }
 
     @Override
@@ -261,11 +272,18 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<String> findTickersByPrefix(String tournamentPrefix) {
+    public List<TournamentSuggestDto> findTickersByPrefix(String tournamentPrefix) {
         return tournamentRepository.findByNameStartsWith(tournamentPrefix).stream()
-                .map(TournamentEntity::getName)
                 .limit(5)
+                .map(tournament -> {
+                    String localizedMode = localizeTournamentMode(tournament.getMode());
+                    return new TournamentSuggestDto(tournament.getName(), localizedMode);
+                })
                 .toList();
+    }
+
+    private String localizeTournamentMode(TournamentMode mode) {
+        return messageSource.getMessage("tournament.mode." + mode.name(), null, Locale.getDefault());
     }
 
     @Override
