@@ -1,6 +1,7 @@
 package ru.screbber.stockSimulator.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.screbber.stockSimulator.entity.UserEntity;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -26,10 +28,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerUser(String username, String email, String rawPassword) throws Exception {
         if (userRepository.findByUsername(username).isPresent()) {
+            log.warn("Регистрация отклонена: имя пользователя '{}' уже занято", username);
             throw new Exception("Username is already taken.");
         }
 
         if (userRepository.findByEmail(email).isPresent()) {
+            log.warn("Регистрация отклонена: email '{}' уже используется", email);
             throw new Exception("Email is already in use.");
         }
 
@@ -40,6 +44,7 @@ public class UserServiceImpl implements UserService {
         newUser.setPassword(passwordEncoder.encode(rawPassword));
         newUser.setEmailVerified(false);
         userRepository.save(newUser);
+        log.info("Пользователь '{}' успешно зарегистрирован", username);
 
         // Генерируем токен
         String token = UUID.randomUUID().toString();
@@ -65,11 +70,13 @@ public class UserServiceImpl implements UserService {
     public boolean confirmEmail(String token) {
         Optional<VerificationTokenEntity> vteOpt = tokenRepository.findByToken(token);
         if (vteOpt.isEmpty()) {
+            log.warn("Подтверждение email отклонено: токен не найден");
             return false;
         }
         VerificationTokenEntity vte = vteOpt.get();
 
         if (vte.getExpiryDate().isBefore(LocalDateTime.now())) {
+            log.warn("Подтверждение email отклонено: токен просрочен");
             return false;
         }
 

@@ -1,6 +1,7 @@
 package ru.screbber.stockSimulator.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import ru.screbber.stockSimulator.constants.TournamentMode;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TournamentServiceImpl implements TournamentService {
 
     private final ParticipationRepository participationRepository;
@@ -49,6 +51,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setRandomStocksCount(dto.getRandomStocksCount());
         tournament.setMaxTeams(dto.getMaxTeams());
         tournamentRepository.save(tournament);
+        log.debug("Турнир '{}' создан пользователем '{}' ", dto.getName(), username);
 
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
